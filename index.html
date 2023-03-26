@@ -16,6 +16,7 @@
     var mushroomNames = ['Girolles', 'Morels', 'Boletes', 'Parasol'];
     var playerColors = ['Blue', 'Green', 'Purple', 'Red', 'Orange'];
     var players = [];
+    var currentPlayer = null;
     
 
     class player{
@@ -26,6 +27,7 @@
             this.mushrooms = [0, 0, 0, 0];
             this.informationPieces = [];
             this.points = 0;
+            this.skipped = null;
         }
     }
     class mushroomBoard{
@@ -80,12 +82,14 @@
             mushroomBoards.push(currentMushroomBoard);
         }
         for(var playerIndex = 0; playerIndex < inNumPlayers; playerIndex++){
-            var currentPlayer = new player(playerIndex);
-            currentPlayer.maxAvailableCrates = 5;
-            currentPlayer.availableCrates = currentPlayer.maxAvailableCrates;
-            players.push(currentPlayer);
+            var newPlayer = new player(playerIndex);
+            newPlayer.maxAvailableCrates = 5;
+            newPlayer.availableCrates = newPlayer.maxAvailableCrates;
+            newPlayer.skipped = false;
+            players.push(newPlayer);
         }
-        
+        firstPlayer = 0;
+        currentPlayer = firstPlayer;
     }
 
     //Start Game
@@ -96,6 +100,7 @@
         gameSetup(inPlayerNumber);
         refreshMushroomBoards();
         refreshPlayerBoards();
+        gameLoop();
     }
 
     function refreshMushroomBoards(){
@@ -105,13 +110,17 @@
             var cratesString = "<div>";
             for(var j = 0; j < mushroomBoard.crates.length; j++){
                 var cratePlayer = mushroomBoard.crates[j];
-                var crateCount = crateNumbers[j];
+                var crateCount = getCrateCost(j);
                 cratesString += "<div>Crate Number: " + crateCount + " Crate Player: " + getPlayerColor(cratePlayer) + "</div>";
             }
             cratesString += "</div>";
             mushroomBoardString += "<div>Mushroom Type: "+getMushroomName(mushroomBoard.mushroomType)+" Quantity: "+mushroomBoard.mushroomQuantity+" " + cratesString + "</div>";
         }
         $("#mushroomBoards").html(mushroomBoardString);
+    }
+
+    function getCrateCost(index){
+        return crateNumbers[index];
     }
 
     function getMushroomName(typeIndex){
@@ -130,13 +139,111 @@
         var playerBoardString = '';
         for(var i = 0; i < players.length; i++){
             var playerString = '<div style="background-color:' + getPlayerColor(i) + '">' + getPlayerColor(i);
-            var currentPlayer = players[i];
+            var currentPlayerObject = players[i];
+            for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
+                playerString += '<div>' + currentPlayerObject.mushrooms[j] + ' X ' + getMushroomName(j) + '</div>';
+            }
+            playerString += '<div>'+currentPlayerObject.availableCrates+' X Crates</div>';
+            playerString += '<div>Turn skipped '+currentPlayerObject.skipped+'</div>';
             playerString += '</div>';
             playerBoardString += playerString;
         }
         $("#playerBoards").html(playerBoardString);
     } 
+
+    function gameLoop(){
+        showTurn();
+        showActions();
+    }
+
+    function showTurn(){
+        $("#current").html("Current Turn: " + getPlayerColor(currentPlayer));
+    }
+
+    function getNextPlayer(){
+        currentPlayer += 1;
+        if(currentPlayer >= players.length){
+            currentPlayer = 0;
+        }
+    }
     
+    function showActions(){
+        var actionString = '';
+        var currentPlayerObject = players[currentPlayer];
+        if(currentPlayerObject.skipped == true){
+            pass();
+        } else {
+            var crates = currentPlayerObject.availableCrates;
+            for(var i = 0; i < mushroomBoards.length; i++){
+                var currentMushroomBoard = mushroomBoards[i];
+                if(currentMushroomBoard.mushroomQuantity > 0){
+                    var cost = getMushroomCost(currentMushroomBoard);
+                    if(cost != null && crates >= cost){
+                        actionString += '<input type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">';
+                    }
+                }
+            }
+            actionString += '<input type="button" value="Pass" onclick="pass()">';
+            $("#actions").html(actionString);
+        }
+    }
+
+    function getMushroomCost(inMushroomBoard){
+        for(var i = 0; i < inMushroomBoard.crates.length; i++){
+            var cratePlayer = inMushroomBoard.crates[i];
+            if(cratePlayer == null){
+                return getCrateCost(i);
+            }
+        }
+        return null;
+    }
+
+    function buyMushroom(mushroomType, cost){
+        var mushroomBoard = mushroomBoards[mushroomType];
+        var currentPlayerObject = players[currentPlayer];
+        currentPlayerObject.availableCrates -= cost;
+        putCratesOnMushroomBoard(mushroomBoard, currentPlayer);
+        currentPlayerObject.mushrooms[mushroomType] += 1;
+        getNextPlayer();
+        refreshMushroomBoards();
+        refreshPlayerBoards();
+        showTurn();
+        showActions();
+    }
+
+    function pass(){
+        players[currentPlayer].skipped = true;
+        getNextPlayer();
+        refreshMushroomBoards();
+        refreshPlayerBoards();
+        var skippedPlayerCount = 0;
+        for(var i = 0; i < players.length; i++){
+            if(players[i].skipped == true){
+                skippedPlayerCount += 1;
+            }
+        }
+        if(skippedPlayerCount == players.length){
+            //TODO Bonus Time
+            //TODO Clear the baskets
+            //TODO Information Sharing / bonus basket
+            //TODO Pass who is first
+            //TODO Start Phase 1 again
+            console.log('All skipped');
+            //At the moment this loops forever here pass pass pass
+        }
+        showTurn();
+        showActions();
+    }
+
+    function putCratesOnMushroomBoard(inMushroomBoard, playerIndex){
+        for(var i = 0; i < inMushroomBoard.crates.length; i++){
+            var cratePlayer = inMushroomBoard.crates[i];
+            if(cratePlayer == null){
+                inMushroomBoard.crates[i] = playerIndex;
+                return;
+            }
+        }
+    }
     
 </script>
 <div id="setup">
@@ -149,6 +256,8 @@
 </div>
 <div id="mushroomBoards"></div>
 <div id="playerBoards"></div>
+<div id="current"></div>
+<div id="actions"></div>
 <div id="gameHistory"></div>
 <div id="secrets"></div>
 </body>
