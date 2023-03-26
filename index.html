@@ -229,19 +229,32 @@
             }
         }
         if(skippedPlayerCount == players.length){
+            console.log('All skipped');
             //TODO Bonus Time
             getBonus();
+            clearCrates();
             refreshMushroomBoards();
             refreshPlayerBoards();
-            //TODO Clear the baskets
-            //TODO Information Sharing / bonus basket
+            //TODO Clear the crates
+            //TODO Information Sharing / bonus crate
             //TODO Pass who is first
             //TODO Start Phase 1 again
-            console.log('All skipped');
             clearActions();
         } else {
             showTurn();
             showActions();
+        }
+    }
+
+    function clearCrates(){
+        for(var i = 0; i < mushroomBoards.length; i++){
+            var currentMushroomBoard = mushroomBoards[i];
+            currentMushroomBoard.crates = [null, null, null, null, null];
+        }
+        for(var j = 0; j < players.length; j++){
+            var playerObject = players[j];
+            playerObject.availableCrates = playerObject.maxAvailableCrates;
+            playerObject.skipped = false;
         }
     }
 
