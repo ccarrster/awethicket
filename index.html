@@ -11,6 +11,10 @@
 <script>
     var numberOfPlayers = null;
     var firstPlayer = null;
+    var mushroomBoards = [];
+    var crateNumbers = [1, 2, 3, 4, 4];
+    var mushroomNames = ['Girolles', 'Morels', 'Boletes', 'Parasol'];
+    var playerColors = ['Blue', 'Green', 'Purple', 'Red', 'Orange'];
 
     class player{
         constructor(){
@@ -22,11 +26,23 @@
         }
     }
     class mushroomBoard{
-        constructor(){
-            this.mushroomType = null;
+        constructor(inMushroomType, inNumPlayers){
+            this.mushroomType = inMushroomType;
             this.crates = [null, null, null, null, null];
             this.information = null;
             this.mushroomQuantity = 0;
+            this.sharedInformation = [];
+            if(inNumPlayers == 2){
+                this.mushroomQuantity = 8;
+            } else if(inNumPlayers == 3){
+                this.mushroomQuantity = 10;
+            } else if(inNumPlayers == 4){
+                this.mushroomQuantity = 12;
+            } else if(inNumPlayers == 5){
+                this.mushroomQuantity = 14;
+            } else {
+                alert('This is the wrong number of players. Between 2 and 5 please.');
+            }
         }
     }
     class information{
@@ -35,6 +51,81 @@
             this.pointValue = null;
         }
     }
+    class informationDeck{
+        constructor(){
+            this.informationPieces = [];
+        }
+    }
+    function isGameOver(){
+        var emptyBoardCount = 0;
+        for(var i = 0; i < mushroomBoards.length; i++){
+            var currentMushroomBoard = mushroomBoards[i];
+            if(currentMushroomBoard.mushroomQuantity == 0){
+                emptyBoardCount += 1;
+            }
+        }
+        if(emptyBoardCount > 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function gameSetup(inNumPlayers){
+        for(var mushroomType = 0; mushroomType < 4; mushroomType++){
+            currentMushroomBoard = new mushroomBoard(mushroomType, inNumPlayers);
+            mushroomBoards.push(currentMushroomBoard);
+        }
+    }
+
+    //Start Game
+    //console.log(isGameOver());
+
+    function choosePlayers(inPlayerNumber){
+        $("#setup").hide();
+        gameSetup(inPlayerNumber);
+        refreshMushroomBoards();
+    }
+
+    function refreshMushroomBoards(){
+        var mushroomBoardString = '';
+        for(var i = 0; i < mushroomBoards.length; i++){
+            var mushroomBoard = mushroomBoards[i];
+            var cratesString = "<div>";
+            for(var j = 0; j < mushroomBoard.crates.length; j++){
+                var cratePlayer = mushroomBoard.crates[j];
+                var crateCount = crateNumbers[j];
+                cratesString += "<div>Crate Number: " + crateCount + " Crate Player: " + getPlayerColor(cratePlayer) + "</div>";
+            }
+            cratesString += "</div>";
+            mushroomBoardString += "<div>Mushroom Type: "+getMushroomName(mushroomBoard.mushroomType)+" Quantity: "+mushroomBoard.mushroomQuantity+" " + cratesString + "</div>";
+        }
+        $("#mushroomBoards").html(mushroomBoardString);
+    }
+
+    function getMushroomName(typeIndex){
+        return mushroomNames[typeIndex];
+    }
+
+    function getPlayerColor(playerIndex){
+        if(playerIndex == null){
+            return 'Empty';
+        } else {
+            return playerColors[playerIndex];
+        }
+    }
 </script>
+<div id="setup">
+    <form>
+        <input type="button" value="2 Players" onclick="choosePlayers(2);">
+        <input type="button" value="3 Players" onclick="choosePlayers(3);">
+        <input type="button" value="4 Players" onclick="choosePlayers(4);">
+        <input type="button" value="5 Players" onclick="choosePlayers(5);">
+    </form>
+</div>
+<div id="mushroomBoards"></div>
+<div id="playerBoards"></div>
+<div id="gameHistory"></div>
+<div id="secrets"></div>
 </body>
 </html>
