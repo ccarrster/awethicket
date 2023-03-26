@@ -229,17 +229,25 @@
             }
         }
         if(skippedPlayerCount == players.length){
-            console.log('All skipped');
-            //TODO Bonus Time
             getBonus();
             clearCrates();
             refreshMushroomBoards();
             refreshPlayerBoards();
-            //TODO Clear the crates
             //TODO Information Sharing / bonus crate
             //TODO Pass who is first
-            //TODO Start Phase 1 again
+            firstPlayer += 1;
+            if(firstPlayer >= players.length){
+                firstPlayer = 0;
+            }
             clearActions();
+            if(isGameOver()){
+                console.log('Game Over');
+                //Scores and ties
+            } else {
+                currentPlayer = firstPlayer;
+                showTurn();
+                showActions();
+            }
         } else {
             showTurn();
             showActions();
