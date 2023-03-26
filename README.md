@@ -19,15 +19,17 @@ Features
 - Crate cost for mushrooms
 - Bonus for the most crates per mushroom field and end of mushroom picking
 
-TODO
+TODO MVP - seek feedback
 - Game logic for different number of players - flipping info cards
 - 2 player flipping deck
-- Score
+- Score / Winner
 - Ties
 - History log
 - Peak cards
 - Share cards
 - Start next game
+
+Nice to have
 - Artwork
 - Animations
 - Sound
