@@ -12,6 +12,7 @@ Game logic for different number of players
 Game setup
 Game Loop
 End Game
+2 player flipping deck
 Score
 Ties
 History log
