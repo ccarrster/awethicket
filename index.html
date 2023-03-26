@@ -17,6 +17,8 @@
     var playerColors = ['Blue', 'Green', 'Purple', 'Red', 'Orange'];
     var players = [];
     var currentPlayer = null;
+    var scores = [1, 3, 5, 7];
+    var informationFlipDeck = null;
     
 
     class player{
@@ -76,20 +78,71 @@
         }
     }
 
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+
     function gameSetup(inNumPlayers){
+        var totalInformationDeck = new informationDeck();
         for(var mushroomType = 0; mushroomType < 4; mushroomType++){
+            var mushroomInformationDeck = new informationDeck();
+            for(var i = 0; i < scores.length; i++){
+                var mushroomInformation = new information();
+                mushroomInformation.mushroomType = mushroomType;
+                mushroomInformation.pointValue = scores[i];
+                mushroomInformationDeck.informationPieces.push(mushroomInformation);
+            }
+            var randomInformation = getRandomInt(4);
+            var chosenInfo = mushroomInformationDeck.informationPieces.splice(randomInformation, 1);
+
             currentMushroomBoard = new mushroomBoard(mushroomType, inNumPlayers);
+            currentMushroomBoard.information = chosenInfo;
             mushroomBoards.push(currentMushroomBoard);
+            for(var j = 0; j < mushroomInformationDeck.informationPieces.length; j++){
+                totalInformationDeck.informationPieces.push(mushroomInformationDeck.informationPieces[j]);
+            }
         }
+
         for(var playerIndex = 0; playerIndex < inNumPlayers; playerIndex++){
             var newPlayer = new player(playerIndex);
             newPlayer.maxAvailableCrates = 5;
             newPlayer.availableCrates = newPlayer.maxAvailableCrates;
             newPlayer.skipped = false;
+
+            if(inNumPlayers == 2){
+                for(var k = 0; k < 4; k++){
+                    var info = takeRandomInformation(totalInformationDeck);
+                    newPlayer.informationPieces.push(info);
+                }
+                //Left over cards
+                informationFlipDeck = totalInformationDeck;
+            } else if(inNumPlayers == 3){
+                for(var k = 0; k < 4; k++){
+                    var info = takeRandomInformation(totalInformationDeck);
+                    newPlayer.informationPieces.push(info);
+                }
+            } else if(inNumPlayers == 4){
+                for(var k = 0; k < 3; k++){
+                    var info = takeRandomInformation(totalInformationDeck);
+                    newPlayer.informationPieces.push(info);
+                }
+            } else if(inNumPlayers == 5){
+                for(var k = 0; k < 2; k++){
+                    var info = takeRandomInformation(totalInformationDeck);
+                    newPlayer.informationPieces.push(info);
+                }
+                //Last cards are not used
+            }
             players.push(newPlayer);
         }
         firstPlayer = 0;
         currentPlayer = firstPlayer;
+    }
+
+    function takeRandomInformation(inInformationDeck){
+        var randomInformation = getRandomInt(inInformationDeck.informationPieces.length);
+        var chosenInfo = inInformationDeck.informationPieces.splice(randomInformation, 1);
+        return chosenInfo;
     }
 
     //Start Game
@@ -234,7 +287,6 @@
             refreshMushroomBoards();
             refreshPlayerBoards();
             //TODO Information Sharing / bonus crate
-            //TODO Pass who is first
             firstPlayer += 1;
             if(firstPlayer >= players.length){
                 firstPlayer = 0;
