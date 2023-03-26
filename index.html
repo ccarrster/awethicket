@@ -15,9 +15,12 @@
     var crateNumbers = [1, 2, 3, 4, 4];
     var mushroomNames = ['Girolles', 'Morels', 'Boletes', 'Parasol'];
     var playerColors = ['Blue', 'Green', 'Purple', 'Red', 'Orange'];
+    var players = [];
+    
 
     class player{
-        constructor(){
+        constructor(inPlayerIndex){
+            this.playerIndex = inPlayerIndex;
             this.availableCrates = null;
             this.maxAvailableCrates = null;
             this.mushrooms = [0, 0, 0, 0];
@@ -76,6 +79,13 @@
             currentMushroomBoard = new mushroomBoard(mushroomType, inNumPlayers);
             mushroomBoards.push(currentMushroomBoard);
         }
+        for(var playerIndex = 0; playerIndex < inNumPlayers; playerIndex++){
+            var currentPlayer = new player(playerIndex);
+            currentPlayer.maxAvailableCrates = 5;
+            currentPlayer.availableCrates = currentPlayer.maxAvailableCrates;
+            players.push(currentPlayer);
+        }
+        
     }
 
     //Start Game
@@ -85,6 +95,7 @@
         $("#setup").hide();
         gameSetup(inPlayerNumber);
         refreshMushroomBoards();
+        refreshPlayerBoards();
     }
 
     function refreshMushroomBoards(){
@@ -114,6 +125,19 @@
             return playerColors[playerIndex];
         }
     }
+
+    function refreshPlayerBoards(){
+        var playerBoardString = '';
+        for(var i = 0; i < players.length; i++){
+            var playerString = '<div style="background-color:' + getPlayerColor(i) + '">' + getPlayerColor(i);
+            var currentPlayer = players[i];
+            playerString += '</div>';
+            playerBoardString += playerString;
+        }
+        $("#playerBoards").html(playerBoardString);
+    } 
+    
+    
 </script>
 <div id="setup">
     <form>
