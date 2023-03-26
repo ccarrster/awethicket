@@ -166,6 +166,11 @@
             currentPlayer = 0;
         }
     }
+
+    function clearActions(){
+        //Temp probably just have different actions
+        $("#actions").html('');
+    }
     
     function showActions(){
         var actionString = '';
@@ -203,6 +208,7 @@
         var currentPlayerObject = players[currentPlayer];
         currentPlayerObject.availableCrates -= cost;
         putCratesOnMushroomBoard(mushroomBoard, currentPlayer);
+        mushroomBoard.mushroomQuantity -= 1;
         currentPlayerObject.mushrooms[mushroomType] += 1;
         getNextPlayer();
         refreshMushroomBoards();
@@ -224,15 +230,51 @@
         }
         if(skippedPlayerCount == players.length){
             //TODO Bonus Time
+            getBonus();
+            refreshMushroomBoards();
+            refreshPlayerBoards();
             //TODO Clear the baskets
             //TODO Information Sharing / bonus basket
             //TODO Pass who is first
             //TODO Start Phase 1 again
             console.log('All skipped');
-            //At the moment this loops forever here pass pass pass
+            clearActions();
+        } else {
+            showTurn();
+            showActions();
         }
-        showTurn();
-        showActions();
+    }
+
+    function getBonus(){
+        for(var i = 0; i < mushroomBoards.length; i++){
+            var totalCrates = [];
+            for(var j = 0; j < players.length; j++){
+                totalCrates.push(0);
+            }
+            var currentMushroomBoard = mushroomBoards[i];
+            if(currentMushroomBoard.mushroomQuantity > 0){
+                for(var k = 0; k < currentMushroomBoard.crates.length; k++){
+                    var cratePlayer = currentMushroomBoard.crates[k];
+                    if(cratePlayer != null){
+                        totalCrates[cratePlayer] += getCrateCost(k);
+                    }
+                }
+                var mostPlayer = null;
+                var mostValue = 0;
+                for(var l = 0; l < totalCrates.length; l++){
+                    if(totalCrates[l] > mostValue){
+                        mostValue = totalCrates[l];
+                        mostPlayer = l;
+                    } else if(totalCrates[l] == mostValue){
+                        mostPlayer = null;
+                    }
+                }
+                if(mostPlayer != null){
+                    currentMushroomBoard.mushroomQuantity -= 1;
+                    players[mostPlayer].mushrooms[i] += 1;
+                }
+            }
+        }
     }
 
     function putCratesOnMushroomBoard(inMushroomBoard, playerIndex){
