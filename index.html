@@ -166,6 +166,7 @@
         for(var i = 0; i < mushroomBoards.length; i++){
             mushroomBoardString += "<div style='border: solid black 4px; margin: 5px;'>";
             var mushroomBoard = mushroomBoards[i];
+            mushroomBoardString += "<img src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
             var cratesString = "<div>";
             for(var j = 0; j < mushroomBoard.crates.length; j++){
                 var cratePlayer = mushroomBoard.crates[j];
@@ -213,9 +214,11 @@
             var playerString = '<div style="margin: 5px; background-color: #eee; border: solid ' + getPlayerColor(i) + ' 4px;">' + getPlayerColor(i);
             var currentPlayerObject = players[i];
             for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
-                playerString += '<div>' + currentPlayerObject.mushrooms[j] + ' X ' + getMushroomName(j) + '</div>';
+
+                
+                playerString += '<div>' + currentPlayerObject.mushrooms[j] + ' X ' + getMushroomName(j) + "<img style='max-width: 20px;' src='" + getMushroomName(j) + ".png' alt='" + getMushroomName(j) + " mushroom'>" +'</div>';
             }
-            playerString += '<div>'+currentPlayerObject.availableCrates+' X Crates</div>';
+            playerString += '<div>'+currentPlayerObject.availableCrates+' X Crates '+"<img style='max-width: 20px; background-color: "+getPlayerColor(i)+";' src='basket.png' alt='basket'>"+'</div>';
             playerString += '<div>Turn skipped '+currentPlayerObject.skipped+'</div>';
             if(isGameOver()){
                 playerString += '<div>Points: ' + currentPlayerObject.points + '</div>';
@@ -263,7 +266,11 @@
                     var cost = getMushroomCost(currentMushroomBoard);
                     if(cost != null && crates >= cost){
                         hasOptions = true;
-                        actionString += '<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">';
+                        var basketString = '';
+                        for(var j = 0; j < cost; j++){
+                            basketString += '<img style="max-width: 50px; background-color: '+getPlayerColor(currentPlayer)+';" src="basket.png" alt="basket">';
+                        }
+                        actionString += '<div>'+"<img style='max-width: 50px;' src='" + getMushroomName(currentMushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(currentMushroomBoard.mushroomType) + " mushroom'>"+'<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">'+basketString+'</div>';
                     }
                 }
             }
