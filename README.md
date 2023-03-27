@@ -28,6 +28,7 @@ TODO MVP - seek feedback
 - History log
 - Share cards/more baskets
 - Start next game
+- Peak is showing up sometimes on start!
 
 Nice to have
 - Artwork
