@@ -20,6 +20,7 @@
     var scores = [1, 3, 5, 7];
     var informationFlipDeck = null;
     var winners = null;
+    var startSharePlayer = null;
     
 
     class player{
@@ -138,7 +139,6 @@
         }
         firstPlayer = 0;
         currentPlayer = firstPlayer;
-        refreshPeak();
     }
 
     function takeRandomInformation(inInformationDeck){
@@ -152,6 +152,7 @@
         gameSetup(inPlayerNumber);
         refreshMushroomBoards();
         refreshPlayerBoards();
+        showSecretsActions();
         gameLoop();
     }
 
@@ -166,7 +167,14 @@
                 cratesString += "<div>Crate Number: " + crateCount + " Crate Player: " + getPlayerColor(cratePlayer) + "</div>";
             }
             cratesString += "</div>";
-            mushroomBoardString += "<div>Mushroom Type: "+getMushroomName(mushroomBoard.mushroomType)+" Quantity: "+mushroomBoard.mushroomQuantity+" " + cratesString + "</div>";
+            var informationString = "<div>";
+            for(var k = 0; k < mushroomBoard.sharedInformation.length; k++){
+                var sharedValue = mushroomBoard.sharedInformation[k].pointValue;
+                informationString += "<div>Shared Value: " + sharedValue + "</div>";
+            }
+            informationString += "</div>";
+            //TODO add informationString
+            mushroomBoardString += "<div>Mushroom Type: "+getMushroomName(mushroomBoard.mushroomType)+" Quantity: "+mushroomBoard.mushroomQuantity+" " + cratesString + informationString +"</div>";
             if(isGameOver()){
                 mushroomBoardString += "<div>Value: " + mushroomBoard.information.pointValue + "</div>";
             }
@@ -223,7 +231,6 @@
         if(currentPlayer >= players.length){
             currentPlayer = 0;
         }
-        refreshPeak();
     }
 
     function clearActions(){
@@ -292,13 +299,13 @@
             clearCrates();
             refreshMushroomBoards();
             refreshPlayerBoards();
-            //TODO Information Sharing / bonus crate
             firstPlayer += 1;
             if(firstPlayer >= players.length){
                 firstPlayer = 0;
             }
             clearActions();
             if(isGameOver()){
+                $('#secrets').html('');
                 console.log('Game Over');
                 //Points
                 for(var i = 0; i < players.length; i++){
@@ -340,10 +347,9 @@
                 refreshPlayerBoards();
                 refreshMushroomBoards();
             } else {
-                currentPlayer = firstPlayer;
-                refreshPeak();
-                showTurn();
-                showActions();
+                //TODO Information Sharing / bonus crate
+                startSharePlayer = currentPlayer;
+                showShareOptions();
             }
         } else {
             showTurn();
@@ -351,8 +357,49 @@
         }
     }
 
+    function showShareOptions(){
+        showTurn();
+        var shareString = '';
+        var currentPlayerObject = players[currentPlayer];
+        var informationPieces = currentPlayerObject.informationPieces;
+        for(var i = 0; i < informationPieces.length; i++){
+            shareString += '<input type="button" value="Share Information card ' + (i + 1) + '" onclick="share('+i+')">';
+        }
+        shareString += '<input type="button" value="Pass" onclick="passShare()">';
+
+
+        $('#actions').html(shareString);
+    }
+
+    function share(informationIndex){
+        console.log('Share: ' + informationIndex);
+        var currentPlayerObject = players[currentPlayer];
+        var chosenInfo = currentPlayerObject.informationPieces.splice(informationIndex, 1)[0];
+        var mushroomType = chosenInfo.mushroomType;
+        var currentMushroomBoard = mushroomBoards[mushroomType];
+        currentMushroomBoard.sharedInformation.push(chosenInfo);
+        finishShare();
+    }
+
+    function passShare(){
+        finishShare();
+    }
+
+    function finishShare(){
+        getNextPlayer();
+        refreshMushroomBoards();
+        refreshPlayerBoards();
+        if(startSharePlayer == currentPlayer){
+            //Start next harvest phase
+            currentPlayer = firstPlayer;
+            showTurn();
+            showActions();
+        } else {
+            showShareOptions();
+        }
+    }
+
     function showWinners(maxScore, maxCount){
-        console.log(winners);
         var winnerString = '';
         winnerString += '<div>Score: ' + maxScore +'</div>'
         winnerString += '<div>Mushroom Count: ' + maxCount +'</div>'
@@ -426,11 +473,12 @@
         }
     }
 
-    function peak(){
-        $("#peak").show();
-    }
     function unpeak(){
-        $("#peak").hide();
+        $("#peak").html('');
+    }
+
+    function showSecretsActions(){
+        $('#secrets').html('<input id="peakbutton" type="button" value="Peak" onmousedown="refreshPeak()" onmouseup="unpeak()" onmouseout="unpeak()">');
     }
     
 </script>
@@ -447,7 +495,7 @@
 <div id="current"></div>
 <div id="actions"></div>
 <div id="gameHistory"></div>
-<div id="secrets"><input id="peakbutton" type="button" value="Peak" onmousedown="peak()" onmouseup="unpeak()" onmouseout="unpeak()"></div>
+<div id="secrets"></div>
 <div id="peak"></div>
 <div id="winners"></div>
 </body>
