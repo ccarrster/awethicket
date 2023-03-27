@@ -148,6 +148,7 @@
     }
 
     function choosePlayers(inPlayerNumber){
+        appendLog('Starting new game with ' + inPlayerNumber + ' players.');
         $("#setup").html('');
         gameSetup(inPlayerNumber);
         refreshMushroomBoards();
@@ -156,9 +157,14 @@
         gameLoop();
     }
 
+    function appendLog(text){
+        $('#gamelogtext').val($('#gamelogtext').val() + text + "\n");
+    }
+
     function refreshMushroomBoards(){
-        var mushroomBoardString = '';
+        var mushroomBoardString = "";
         for(var i = 0; i < mushroomBoards.length; i++){
+            mushroomBoardString += "<div style='border: solid black 4px; margin: 5px;'>";
             var mushroomBoard = mushroomBoards[i];
             var cratesString = "<div>";
             for(var j = 0; j < mushroomBoard.crates.length; j++){
@@ -173,11 +179,14 @@
                 informationString += "<div>Shared Value: " + sharedValue + "</div>";
             }
             informationString += "</div>";
-            //TODO add informationString
             mushroomBoardString += "<div>Mushroom Type: "+getMushroomName(mushroomBoard.mushroomType)+" Quantity: "+mushroomBoard.mushroomQuantity+" " + cratesString + informationString +"</div>";
+            
+            
+            
             if(isGameOver()){
                 mushroomBoardString += "<div>Value: " + mushroomBoard.information.pointValue + "</div>";
             }
+            mushroomBoardString += '</div>';
         }
         $("#mushroomBoards").html(mushroomBoardString);
     }
@@ -201,7 +210,7 @@
     function refreshPlayerBoards(){
         var playerBoardString = '';
         for(var i = 0; i < players.length; i++){
-            var playerString = '<div style="background-color:' + getPlayerColor(i) + '">' + getPlayerColor(i);
+            var playerString = '<div style="margin: 5px; background-color: #eee; border: solid ' + getPlayerColor(i) + ' 4px;">' + getPlayerColor(i);
             var currentPlayerObject = players[i];
             for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
                 playerString += '<div>' + currentPlayerObject.mushrooms[j] + ' X ' + getMushroomName(j) + '</div>';
@@ -218,6 +227,7 @@
     } 
 
     function gameLoop(){
+        appendLog('Picking Mushrooms Phase.');
         showTurn();
         showActions();
     }
@@ -239,23 +249,30 @@
     }
     
     function showActions(){
+        appendLog(getPlayerColor(currentPlayer) + ' turn to pick mushrooms.');
         var actionString = '<div>Game Phase: Picking Mushrooms</div>';
         var currentPlayerObject = players[currentPlayer];
         if(currentPlayerObject.skipped == true){
             pass();
         } else {
             var crates = currentPlayerObject.availableCrates;
+            var hasOptions = false;
             for(var i = 0; i < mushroomBoards.length; i++){
                 var currentMushroomBoard = mushroomBoards[i];
                 if(currentMushroomBoard.mushroomQuantity > 0){
                     var cost = getMushroomCost(currentMushroomBoard);
                     if(cost != null && crates >= cost){
-                        actionString += '<input type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">';
+                        hasOptions = true;
+                        actionString += '<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">';
                     }
                 }
             }
-            actionString += '<input type="button" value="Pass" onclick="pass()">';
+            actionString += '<input style="margin: 5px;" type="button" value="Pass" onclick="pass()">';
             $("#actions").html(actionString);
+            if(hasOptions == false){
+                appendLog(getPlayerColor(currentPlayer) + ' automatically passes for Picking Mushrooms.');
+                pass();
+            }
         }
     }
 
@@ -270,6 +287,7 @@
     }
 
     function buyMushroom(mushroomType, cost){
+        appendLog(getPlayerColor(currentPlayer) + ' picked a ' + getMushroomName(mushroomType) + ' with ' + cost + ' crates.');
         var mushroomBoard = mushroomBoards[mushroomType];
         var currentPlayerObject = players[currentPlayer];
         currentPlayerObject.availableCrates -= cost;
@@ -284,6 +302,7 @@
     }
 
     function pass(){
+        appendLog(getPlayerColor(currentPlayer) + ' passed picking mushrooms.');
         players[currentPlayer].skipped = true;
         getNextPlayer();
         refreshMushroomBoards();
@@ -295,27 +314,33 @@
             }
         }
         if(skippedPlayerCount == players.length){
+            appendLog('Bonus mushrooms.');
             getBonus();
             clearCrates();
             refreshMushroomBoards();
             refreshPlayerBoards();
-            firstPlayer += 1;
-            if(firstPlayer >= players.length){
-                firstPlayer = 0;
-            }
             clearActions();
             if(isGameOver()){
+                appendLog('The game is over.');
                 $('#secrets').html('');
                 //Points
+                for(var l = 0; l < mushroomBoards.length; l++){
+                    var mushroomValue = mushroomBoards[l].information.pointValue;
+                    appendLog(getMushroomName(l) + ' is worth ' + mushroomValue + ' points.');
+                }
+
                 for(var i = 0; i < players.length; i++){
                     var player = players[i];
                     player.points = 0;
+                    var playerTotalMushroomCount = 0;
                     for(var j = 0; j < player.mushrooms.length; j++){
                         var mushroomCount = player.mushrooms[j];
+                        playerTotalMushroomCount += mushroomCount;
                         var mushroomType = j;
                         var mushroomValue = mushroomBoards[j].information.pointValue;
                         player.points += mushroomCount * mushroomValue;
                     }
+                    appendLog(getPlayerColor(i) + ' has ' + player.points + ' points and ' + playerTotalMushroomCount + ' total mushrooms.');
                 }
                 //Winner and Ties
                 winners = [];
@@ -347,7 +372,7 @@
                 refreshMushroomBoards();
                 showRestartOptions();
             } else {
-                //TODO Information Sharing / bonus crate
+                appendLog('Knowledge Swap Phase.');
                 startSharePlayer = currentPlayer;
                 showShareOptions();
             }
@@ -358,7 +383,7 @@
     }
 
     function showRestartOptions(){
-        $('#actions').html('<input type="button" value="Start a new game" onclick="showPlayerOptions()">');
+        $('#actions').html('<input type="button" style="margin: 5px;" value="Start a new game" onclick="showPlayerOptions()">');
     }
 
     function showPlayerOptions(){
@@ -374,27 +399,30 @@
         startSharePlayer = null;
 
         //reset view
-        var playerString = '<form> <input type="button" value="2 Players" onclick="choosePlayers(2);"> <input type="button" value="3 Players" onclick="choosePlayers(3);"> <input type="button" value="4 Players" onclick="choosePlayers(4);"> <input type="button" value="5 Players" onclick="choosePlayers(5);"> </form>';
+        var playerString = '<form> <input type="button" style="margin: 5px;" value="2 Players" onclick="choosePlayers(2);"> <input style="margin: 5px;" type="button" value="3 Players" onclick="choosePlayers(3);"> <input style="margin: 5px;" type="button" value="4 Players" onclick="choosePlayers(4);"> <input style="margin: 5px;" type="button" value="5 Players" onclick="choosePlayers(5);"> </form>';
         $('#setup').html(playerString);
         $('#mushroomBoards').html('');
         $('#playerBoards').html('');
         $('#current').html('');
         $('#winners').html('');
+        $('#gamelogtext').val('');
         $('#actions').html('<div>Game Phase: Pick number of players</div>');
     }
 
-    function showShareOptions(){        
+    function showShareOptions(){   
+        appendLog(getPlayerColor(currentPlayer) + ' turn to Knowledge Swap.');
         showTurn();
         var shareString = '<div>Game Phase: Knowledge Swap</div>';
         var currentPlayerObject = players[currentPlayer];
         if(currentPlayerObject.maxAvailableCrates < 7){
             var informationPieces = currentPlayerObject.informationPieces;
             for(var i = 0; i < informationPieces.length; i++){
-                shareString += '<input type="button" value="Share Information card ' + (i + 1) + '" onclick="share('+i+')">';
+                shareString += '<input type="button" style="margin: 5px;" value="Share Information card ' + (i + 1) + '" onclick="share('+i+')">';
             }
-            shareString += '<input type="button" value="Pass" onclick="passShare()">';
+            shareString += '<input type="button" style="margin: 5px;" value="Pass" onclick="passShare()">';
             $('#actions').html(shareString);
         } else {
+            appendLog(getPlayerColor(currentPlayer) + ' automatically passes for Knowledge Swap.');
             passShare();
         }
     }
@@ -407,10 +435,12 @@
         currentMushroomBoard.sharedInformation.push(chosenInfo);
         currentPlayerObject.maxAvailableCrates += 1;
         currentPlayerObject.availableCrates = currentPlayerObject.maxAvailableCrates;
+        appendLog(getPlayerColor(currentPlayer) + ' shares ' + getMushroomName(mushroomType) + ' is not worth ' + chosenInfo.pointValue + ' for Knowledge Swap and now has ' + currentPlayerObject.maxAvailableCrates + ' crates.');
         finishShare();
     }
 
     function passShare(){
+        appendLog(getPlayerColor(currentPlayer) + ' passes for Knowledge Swap.');
         finishShare();
     }
 
@@ -423,11 +453,18 @@
                 var infoToFlip = informationFlipDeck.informationPieces.splice(0, 1)[0];
                 var currentMushroomBoard = mushroomBoards[infoToFlip.mushroomType];
                 currentMushroomBoard.sharedInformation.push(infoToFlip);
+                appendLog('The deck automatically shares ' + getMushroomName(infoToFlip.mushroomType) + ' is not worth ' + infoToFlip.pointValue + ' for Knowledge Swap.');
                 refreshMushroomBoards();
             }
             //Start next harvest phase
+            firstPlayer += 1;
+            if(firstPlayer >= players.length){
+                firstPlayer = 0;
+            }
+            appendLog('The first player will be ' + getPlayerColor(firstPlayer) + '.');
             currentPlayer = firstPlayer;
             showTurn();
+            appendLog('Picking Mushrooms Phase.');
             showActions();
         } else {
             showShareOptions();
@@ -435,12 +472,14 @@
     }
 
     function showWinners(maxScore, maxCount){
+        appendLog('The winners are:');
         var winnerString = '<div>Game Phase: End Game</div>';
         winnerString += '<div>Score: ' + maxScore +'</div>'
         winnerString += '<div>Mushroom Count: ' + maxCount +'</div>'
         for(var i = 0; i < winners.length; i++){
             var winner = winners[i];
             winnerString += '<div>Winner: ' + getPlayerColor(winner)+'</div>';
+            appendLog(getPlayerColor(winner));
         }
         $('#winners').html(winnerString);
     }
@@ -493,6 +532,7 @@
                 if(mostPlayer != null){
                     currentMushroomBoard.mushroomQuantity -= 1;
                     players[mostPlayer].mushrooms[i] += 1;
+                    appendLog(getPlayerColor(mostPlayer) + ' gets a bonus ' + getMushroomName(i) + '.');
                 }
             }
         }
@@ -513,16 +553,16 @@
     }
 
     function showSecretsActions(){
-        $('#secrets').html('<input id="peakbutton" type="button" value="Peak" onmousedown="refreshPeak()" onmouseup="unpeak()" onmouseout="unpeak()">');
+        $('#secrets').html('<input style="margin: 5px;" id="peakbutton" type="button" value="Peak" onmousedown="refreshPeak()" onmouseup="unpeak()" onmouseout="unpeak()">');
     }
     
 </script>
 <div id="setup">
     <form>
-        <input type="button" value="2 Players" onclick="choosePlayers(2);">
-        <input type="button" value="3 Players" onclick="choosePlayers(3);">
-        <input type="button" value="4 Players" onclick="choosePlayers(4);">
-        <input type="button" value="5 Players" onclick="choosePlayers(5);">
+        <input type="button" style="margin: 5px;" value="2 Players" onclick="choosePlayers(2);">
+        <input type="button" style="margin: 5px;" value="3 Players" onclick="choosePlayers(3);">
+        <input type="button" style="margin: 5px;" value="4 Players" onclick="choosePlayers(4);">
+        <input type="button" style="margin: 5px;" value="5 Players" onclick="choosePlayers(5);">
     </form>
 </div>
 <div id="mushroomBoards"></div>
@@ -533,5 +573,6 @@
 <div id="secrets"></div>
 <div id="peak"></div>
 <div id="winners"></div>
+<div id="gamelog"><textarea id="gamelogtext" readonly></textarea></div>
 </body>
 </html>
