@@ -20,13 +20,13 @@ Features
 - Bonus for the most crates per mushroom field and end of mushroom picking
 - Peak cards
 - Game logic for different number of players - flipping info cards
+- Score / Winner
+- Ties
 
 TODO MVP - seek feedback
 - 2 player flipping deck
-- Score / Winner
-- Ties
 - History log
-- Share cards
+- Share cards/more baskets
 - Start next game
 
 Nice to have
