@@ -419,6 +419,12 @@
         refreshMushroomBoards();
         refreshPlayerBoards();
         if(startSharePlayer == currentPlayer){
+            if(players.length == 2 && informationFlipDeck.informationPieces.length > 0){
+                var infoToFlip = informationFlipDeck.informationPieces.splice(0, 1)[0];
+                var currentMushroomBoard = mushroomBoards[infoToFlip.mushroomType];
+                currentMushroomBoard.sharedInformation.push(infoToFlip);
+                refreshMushroomBoards();
+            }
             //Start next harvest phase
             currentPlayer = firstPlayer;
             showTurn();
