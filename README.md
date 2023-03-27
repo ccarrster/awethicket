@@ -22,13 +22,12 @@ Features
 - Game logic for different number of players - flipping info cards
 - Score / Winner
 - Ties
+- Share cards/more baskets
+- Start next game
 
 TODO MVP - seek feedback
 - 2 player flipping deck
 - History log
-- Share cards/more baskets
-- Start next game
-- Peak is showing up sometimes on start!
 
 Nice to have
 - Artwork
