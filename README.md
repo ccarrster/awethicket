@@ -24,9 +24,9 @@ Features
 - Ties
 - Share cards/more baskets
 - Start next game
+- 2 player flipping deck
 
 TODO MVP - seek feedback
-- 2 player flipping deck
 - History log
 
 Nice to have
