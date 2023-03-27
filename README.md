@@ -25,8 +25,6 @@ Features
 - Share cards/more baskets
 - Start next game
 - 2 player flipping deck
-
-TODO MVP - seek feedback
 - History log
 
 Nice to have
