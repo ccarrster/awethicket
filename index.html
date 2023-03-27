@@ -137,12 +137,13 @@
         }
         firstPlayer = 0;
         currentPlayer = firstPlayer;
+        refreshPeak();
     }
 
     function takeRandomInformation(inInformationDeck){
         var randomInformation = getRandomInt(inInformationDeck.informationPieces.length);
         var chosenInfo = inInformationDeck.informationPieces.splice(randomInformation, 1);
-        return chosenInfo;
+        return chosenInfo[0];
     }
 
     //Start Game
@@ -218,6 +219,7 @@
         if(currentPlayer >= players.length){
             currentPlayer = 0;
         }
+        refreshPeak();
     }
 
     function clearActions(){
@@ -297,6 +299,7 @@
                 //Scores and ties
             } else {
                 currentPlayer = firstPlayer;
+                refreshPeak();
                 showTurn();
                 showActions();
             }
@@ -304,6 +307,15 @@
             showTurn();
             showActions();
         }
+    }
+
+    function refreshPeak(){
+        var peakString = '';
+        var playerInfo = players[currentPlayer].informationPieces;
+        for(var i = 0; i < playerInfo.length; i++) {
+            peakString += '<div>Mushroom Type: '+getMushroomName(playerInfo[i].mushroomType)+' Point Value: '+playerInfo[i].pointValue+'<div>'
+        }
+        $("#peak").html(peakString);
     }
 
     function clearCrates(){
@@ -359,6 +371,13 @@
             }
         }
     }
+
+    function peak(){
+        $("#peak").show();
+    }
+    function unpeak(){
+        $("#peak").hide();
+    }
     
 </script>
 <div id="setup">
@@ -374,6 +393,7 @@
 <div id="current"></div>
 <div id="actions"></div>
 <div id="gameHistory"></div>
-<div id="secrets"></div>
+<div id="secrets"><input id="peakbutton" type="button" value="Peak" onmousedown="peak()" onmouseup="unpeak()" onmouseout="unpeak()"></div>
+<div id="peak"></div>
 </body>
 </html>
