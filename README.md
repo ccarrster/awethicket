@@ -18,14 +18,14 @@ Features
 - Spend crates to buy mushrooms
 - Crate cost for mushrooms
 - Bonus for the most crates per mushroom field and end of mushroom picking
+- Peak cards
+- Game logic for different number of players - flipping info cards
 
 TODO MVP - seek feedback
-- Game logic for different number of players - flipping info cards
 - 2 player flipping deck
 - Score / Winner
 - Ties
 - History log
-- Peak cards
 - Share cards
 - Start next game
 
