@@ -28,6 +28,7 @@ Features
 - History log
 
 Nice to have
+- Accessable interface
 - Artwork
 - Animations
 - Sound
