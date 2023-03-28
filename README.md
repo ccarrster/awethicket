@@ -26,10 +26,10 @@ Features
 - Start next game
 - 2 player flipping deck
 - History log
+- Artwork
 
 Nice to have
 - Accessable interface
-- Artwork
 - Animations
 - Sound
 - AI
