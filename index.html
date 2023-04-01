@@ -89,6 +89,7 @@
     }
 
     function gameSetup(inNumPlayers){
+        $('#gamelog').css('display', 'inline-block');
         var totalInformationDeck = new informationDeck();
         for(var mushroomType = 0; mushroomType < 4; mushroomType++){
             var mushroomInformationDeck = new informationDeck();
@@ -522,6 +523,7 @@
         informationFlipDeck = null;
         winners = null;
         startSharePlayer = null;
+        $('#extraCrates').html('');
 
         //reset view
         var playerString = '<form> <input type="button" style="margin: 5px;" value="2 Players" onclick="choosePlayers(2);"> <input style="margin: 5px;" type="button" value="3 Players" onclick="choosePlayers(3);"> <input style="margin: 5px;" type="button" value="4 Players" onclick="choosePlayers(4);"> <input style="margin: 5px;" type="button" value="5 Players" onclick="choosePlayers(5);"> </form>';
@@ -532,6 +534,7 @@
         $('#winners').html('');
         $('#gamelogtext').val('');
         $('#actions').html('<div>Game Phase: Pick number of players</div>');
+        $('#gamelog').hide();
     }
 
     var inShareMode = false;
@@ -784,7 +787,7 @@
         <div id="mushroomBoards"></div>
         <div id="playerBoards"></div>
     </div>
-    <div style="display: inline-block; position: relative; top: 0px;"><div>Game Log</div><textarea id="gamelogtext" readonly style="width: 400px; height: 400px;"></textarea></div>
+    <div id="gamelog" style="display: none; position: relative; top: 0px;"><div>Game Log</div><textarea id="gamelogtext" readonly style="width: 400px; height: 400px;"></textarea></div>
 </div>
 <style id="customAnimation">
 </style>
