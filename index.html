@@ -384,6 +384,12 @@
         return null;
     }
 
+    function clearClass(idTag){
+        if(document.getElementById(idTag) != null){
+            document.getElementById(idTag).className = "";
+        }
+    }
+
     function buyMushroom(mushroomType, cost){
         $('.buybutton').hide();
         var playerIdString = "mushroomsmallplayer_"+currentPlayer+"_"+mushroomType;
@@ -392,10 +398,10 @@
         var playerCrateIdString = "crateplayersmall_"+currentPlayer+"_"+mushroomType;
         omnomEats(playerCrateIdString, mushroomCrateIdString);
         setTimeout(() => {  
-           document.getElementById(playerCrateIdString).className = "";
+            clearClass(playerCrateIdString);
            omnomEats(mushroomIdString, playerIdString);
             setTimeout(() => {  
-                document.getElementById(mushroomIdString).className = "";
+                clearClass(mushroomIdString);
                 appendLog(getPlayerColor(currentPlayer) + ' picked a ' + getMushroomName(mushroomType) + ' with ' + cost + ' crates.');
                 var mushroomBoard = mushroomBoards[mushroomType];
                 var currentPlayerObject = players[currentPlayer];
@@ -440,6 +446,8 @@
         refreshPlayerBoards();
         clearActions();
         if(isGameOver()){
+            informationFlipDeck = null;
+            refreshFlipDeck();
             appendLog('The game is over.');
             $('#secrets').html('');
             //Points
@@ -555,12 +563,12 @@
         var mushroomInformationId = 'cratemushroomsmall_'+mushroomType+'_4_0';
         omnomEats(informationId, mushroomInformationId);
         setTimeout(() => {  
-            document.getElementById(informationId).className = "";
+            clearClass(informationId);
             var extraCratesId = 'extracrate_'+currentPlayer+'_0';
             var playerCrateId = 'crateplayersmall_'+currentPlayer+'_0';
             omnomEats(extraCratesId, playerCrateId);
             setTimeout(() => {  
-                document.getElementById(extraCratesId).className = "";
+                clearClass(extraCratesId);
                 finishShare();
             }, 1000);
         }, 1000);
@@ -588,7 +596,7 @@
                 var mushroomInfoId = 'cratemushroomsmall_'+infoToFlip.mushroomType+'_4_0';
                 omnomEats(flipDeckId, mushroomInfoId);
                 setTimeout(() => {  
-                    document.getElementById(flipDeckId).className = "";
+                    clearClass(flipDeckId);
                     mushroomBonusIndex += 1;
                     refreshMushroomBoards();
                     refreshFlipDeck();
@@ -700,7 +708,7 @@
                     var mushroomIdString = "mushroomsmall_"+mushroomBonusIndex+"_0";
                     omnomEats(mushroomIdString, playerIdString);
                     setTimeout(() => {  
-                        document.getElementById(mushroomIdString).className = "";
+                        clearClass(mushroomIdString);
                         mushroomBonusIndex += 1;
                         getBonus();
                     }, 1000);
@@ -743,8 +751,12 @@
 
     function refreshFlipDeck(){
         var flipDeckString = '';
-        for(var i = 0; i < informationFlipDeck.informationPieces.length; i++){
-            flipDeckString += '<div id="flipdeck_'+i+'" style="position: relative; overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
+        if(informationFlipDeck != null){
+            for(var i = 0; i < informationFlipDeck.informationPieces.length; i++){
+                flipDeckString += '<div id="flipdeck_'+i+'" style="position: relative; overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
+            }
+        } else {
+            $('#extraInfo').height(0);
         }
         $('#extraInfo').html(flipDeckString);
     }
