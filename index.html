@@ -23,6 +23,7 @@
     var informationFlipDeck = null;
     var winners = null;
     var startSharePlayer = null;
+    var gameOver = false;
     
 
     class player{
@@ -198,8 +199,8 @@
                 quantityImages += "<img id='mushroomsmall_"+i+"_"+l+"' style='position: absolute; left: "+20*l+"px; max-width: 20px;' src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
             }
             mushroomBoardString += getMushroomName(mushroomBoard.mushroomType)+" "+mushroomBoard.mushroomQuantity+" " + quantityImages + " " + cratesString + informationString;
-            if(isGameOver()){
-                mushroomBoardString += "<div>Value: " + mushroomBoard.information.pointValue + "</div>";
+            if(gameOver == true){
+                mushroomBoardString += '<div style="position: relative; overflow: none; margin: 5px; margin-left: 170px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 80px; height: 120px;">'+"<img style='max-width: 35px; position: absolute; right: 5px; bottom: 5px;' src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'> "+mushroomBoard.information.pointValue+'</div>';
             }
             mushroomBoardString += "</div>";
             mushroomBoardString += '</div>';
@@ -260,7 +261,7 @@
                 playerString += '<div id="information_'+i+'_'+n+'" onclick="shareInfo('+i+', '+n+')" style="position: relative; overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
             }
 
-            if(isGameOver()){
+            if(gameOver == true){
                 playerString += '<div>Points: ' + currentPlayerObject.points + '</div>';
             }
             playerString += '</div>';
@@ -441,12 +442,14 @@
         }
     }
 
+
     function afterBonus(){
         clearCrates();
         refreshMushroomBoards();
         refreshPlayerBoards();
         clearActions();
         if(isGameOver()){
+            gameOver = true;
             informationFlipDeck = null;
             refreshFlipDeck();
             appendLog('The game is over.');
@@ -523,6 +526,7 @@
         informationFlipDeck = null;
         winners = null;
         startSharePlayer = null;
+        gameOver = false;
         $('#extraCrates').html('');
 
         //reset view
