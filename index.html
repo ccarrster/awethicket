@@ -43,8 +43,10 @@
             this.information = null;
             this.mushroomQuantity = 0;
             this.sharedInformation = [];
+            $('#extraInfo').height(0); 
             if(inNumPlayers == 2){
                 this.mushroomQuantity = 8;
+                $('#extraInfo').height(70); 
             } else if(inNumPlayers == 3){
                 this.mushroomQuantity = 10;
             } else if(inNumPlayers == 4){
@@ -120,6 +122,7 @@
                 }
                 //Left over cards
                 informationFlipDeck = totalInformationDeck;
+                refreshFlipDeck();
             } else if(inNumPlayers == 3){
                 for(var k = 0; k < 4; k++){
                     var info = takeRandomInformation(totalInformationDeck);
@@ -141,6 +144,7 @@
         }
         firstPlayer = 0;
         currentPlayer = firstPlayer;
+        refreshExtraCrates();
     }
 
     function takeRandomInformation(inInformationDeck){
@@ -181,14 +185,11 @@
                 cratesString += "<div style='position: relative;'>" + crateImages +  "<div style='position: absolute; left: 100px; top: "+j*20+"px;' class='buybutton' id='buymushroom_" + i + "_" + j + "'></div></div>";
             }
             cratesString += "</div>";
-            var informationString = "<div style='position: absolute; bottom: 10px; left: 10px;'>Shared Value: ";
+            var informationString = "<div style='position: absolute; bottom: 10px; left: 10px;'>";
             mushroomBoard.sharedInformation.sort(pointSort);
             for(var k = 0; k < mushroomBoard.sharedInformation.length; k++){
                 var sharedValue = mushroomBoard.sharedInformation[k].pointValue;
-                informationString += sharedValue;
-                if(k != mushroomBoard.sharedInformation.length - 1){
-                    informationString += ", ";
-                }
+                informationString += '<div style="position: relative; overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">'+"<img style='max-width: 35px; position: absolute; right: 5px; bottom: 5px;' src='" + getMushroomName(mushroomBoard.sharedInformation[k].mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.sharedInformation[k].mushroomType) + " mushroom'> "+mushroomBoard.sharedInformation[k].pointValue+'</div>';
             }
             informationString += "</div>";
             var quantityImages = '';
@@ -236,7 +237,7 @@
             if(currentPlayerObject.skipped){
                 borderStyle = 'double';
             }
-            var playerString = '<div style="width: 250px; position: relative; margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: block;">' + getPlayerColor(i);
+            var playerString = '<div style="width: 250px; height: 300px; position: relative; margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
             for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
 
                 var mushroomImages = '';
@@ -255,7 +256,7 @@
             playerString += '<div>First Player '+ (i == firstPlayer) +'</div>';
             
             for(var n = 0; n < currentPlayerObject.informationPieces.length; n++){
-                playerString += '<div id="information_'+i+'_'+n+'" onclick="shareInfo('+i+', '+n+')" style="overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
+                playerString += '<div id="information_'+i+'_'+n+'" onclick="shareInfo('+i+', '+n+')" style="position: relative; overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
             }
 
             if(isGameOver()){
@@ -327,38 +328,40 @@
     function omnomEats(from, to){
         //I have seen an error like the element does not exist
         var elementFrom = document.getElementById(from);
-        var rectFrom = elementFrom.getBoundingClientRect();
         var elementTo = document.getElementById(to);
-        var rectTo = elementTo.getBoundingClientRect();
-        var styleElement = document.getElementById('customAnimation');
-        var yChange = rectFrom.top - rectTo.top;
-        //Not sure why minus 1
-        var yChange = yChange * -1;
-        var xChange = rectTo.left - rectFrom.left;
-        //Not sure why + 50
-        var xChange = xChange + 50;
-        styleElement.innerHTML = '	.nomnomEat{\
-        animation:mysecond 2s;\
-        -webkit-animation:mysecond 2s; /* Safari and Chrome */\
-        }\
-    \
-        @keyframes mysecond\
-        {\
-        0%   {left:0px; top:0px;}\
-        50%   {left:'+xChange+'px; top:'+yChange+'px;}\
-        100% {left:0px; top:0px;}\
-        }\
-    \
-        @-webkit-keyframes mysecond /* Safari and Chrome */\
-        {\
-        0%   {left:0px; top:0px;}\
-        50% {left:'+xChange+'px; top:'+yChange+'px;}\
-        100% {left:0px; top:0px;}\
-        }';
-        document.getElementById(from).className = "nomnomEat";
-        eatFrom = from;
-        //foodToClear.push(eatFrom);
-        //setTimeout("clearFood()",1100);
+        if(elementFrom != null && elementTo != null){
+            var rectFrom = elementFrom.getBoundingClientRect();
+            var rectTo = elementTo.getBoundingClientRect();
+            var styleElement = document.getElementById('customAnimation');
+            var yChange = rectFrom.top - rectTo.top;
+            //Not sure why minus 1
+            var yChange = yChange * -1;
+            var xChange = rectTo.left - rectFrom.left;
+            //Not sure why + 50
+            var xChange = xChange + 50;
+            styleElement.innerHTML = '	.nomnomEat{\
+            animation:mysecond 2s;\
+            -webkit-animation:mysecond 2s; /* Safari and Chrome */\
+            }\
+        \
+            @keyframes mysecond\
+            {\
+            0%   {left:0px; top:0px;}\
+            50%   {left:'+xChange+'px; top:'+yChange+'px;}\
+            100% {left:0px; top:0px;}\
+            }\
+        \
+            @-webkit-keyframes mysecond /* Safari and Chrome */\
+            {\
+            0%   {left:0px; top:0px;}\
+            50% {left:'+xChange+'px; top:'+yChange+'px;}\
+            100% {left:0px; top:0px;}\
+            }';
+            document.getElementById(from).className = "nomnomEat";
+            eatFrom = from;
+            //foodToClear.push(eatFrom);
+            //setTimeout("clearFood()",1100);
+        }
     }
 
     function getMushroomCost(inMushroomBoard){
@@ -548,7 +551,20 @@
         currentPlayerObject.maxAvailableCrates += 1;
         currentPlayerObject.availableCrates = currentPlayerObject.maxAvailableCrates;
         appendLog(getPlayerColor(currentPlayer) + ' shares ' + getMushroomName(mushroomType) + ' is not worth ' + chosenInfo.pointValue + ' for Knowledge Swap and now has ' + currentPlayerObject.maxAvailableCrates + ' crates.');
-        finishShare();
+        var informationId = 'information_'+currentPlayer+'_0';
+        var mushroomInformationId = 'cratemushroomsmall_'+mushroomType+'_4_0';
+        omnomEats(informationId, mushroomInformationId);
+        setTimeout(() => {  
+            document.getElementById(informationId).className = "";
+            var extraCratesId = 'extracrate_'+currentPlayer+'_0';
+            var playerCrateId = 'crateplayersmall_'+currentPlayer+'_0';
+            omnomEats(extraCratesId, playerCrateId);
+            setTimeout(() => {  
+                document.getElementById(extraCratesId).className = "";
+                finishShare();
+            }, 1000);
+        }, 1000);
+        
     }
 
     function passShare(){
@@ -560,6 +576,7 @@
         getNextPlayer();
         refreshMushroomBoards();
         refreshPlayerBoards();
+        refreshExtraCrates();
         if(startSharePlayer == currentPlayer){
             inShareMode = false;
             if(players.length == 2 && informationFlipDeck.informationPieces.length > 0){
@@ -567,22 +584,36 @@
                 var currentMushroomBoard = mushroomBoards[infoToFlip.mushroomType];
                 currentMushroomBoard.sharedInformation.push(infoToFlip);
                 appendLog('The deck automatically shares ' + getMushroomName(infoToFlip.mushroomType) + ' is not worth ' + infoToFlip.pointValue + ' for Knowledge Swap.');
-                refreshMushroomBoards();
+                var flipDeckId = 'flipdeck_0';
+                var mushroomInfoId = 'cratemushroomsmall_'+infoToFlip.mushroomType+'_4_0';
+                omnomEats(flipDeckId, mushroomInfoId);
+                setTimeout(() => {  
+                    document.getElementById(flipDeckId).className = "";
+                    mushroomBonusIndex += 1;
+                    refreshMushroomBoards();
+                    refreshFlipDeck();
+                    startNextHarvest();
+                }, 1000);
+            } else {
+                startNextHarvest();
             }
-            //Start next harvest phase
-            firstPlayer += 1;
-            if(firstPlayer >= players.length){
-                firstPlayer = 0;
-            }
-            appendLog('The first player will be ' + getPlayerColor(firstPlayer) + '.');
-            currentPlayer = firstPlayer;
-            refreshPlayerBoards();
-            showTurn();
-            appendLog('Picking Mushrooms Phase.');
-            showActions();
         } else {
             showShareOptions();
         }
+    }
+
+    function startNextHarvest(){
+        //Start next harvest phase
+        firstPlayer += 1;
+        if(firstPlayer >= players.length){
+            firstPlayer = 0;
+        }
+        appendLog('The first player will be ' + getPlayerColor(firstPlayer) + '.');
+        currentPlayer = firstPlayer;
+        refreshPlayerBoards();
+        showTurn();
+        appendLog('Picking Mushrooms Phase.');
+        showActions();
     }
 
     function showWinners(maxScore, maxCount){
@@ -601,7 +632,7 @@
     function refreshPeak(){
         var playerInfo = players[currentPlayer].informationPieces;
         for(var i = 0; i < playerInfo.length; i++) {
-            $('#information_'+currentPlayer+'_'+i).html("<img style='max-width: 25px;' src='" + getMushroomName(playerInfo[i].mushroomType) + ".png' alt='" + getMushroomName(playerInfo[i].mushroomType) + " mushroom'>"+playerInfo[i].pointValue);
+            $('#information_'+currentPlayer+'_'+i).html("<img style='max-width: 35px; position: absolute; right: 5px; bottom: 5px;' src='" + getMushroomName(playerInfo[i].mushroomType) + ".png' alt='" + getMushroomName(playerInfo[i].mushroomType) + " mushroom'> "+playerInfo[i].pointValue);
         }
     }
 
@@ -694,8 +725,28 @@
         }
     }
 
+    function refreshExtraCrates(){
+        var extraCratesString = '';
+        var crateIndex = 0;
+        for(var i = 0; i < players.length; i++){
+            for(var j = 0; j < 7 - players[i].maxAvailableCrates; j++){
+                extraCratesString += "<img id='extracrate_"+i+"_"+j+"' style='max-width: 20px; position: absolute; left: "+crateIndex*20+"px; background-color: "+getPlayerColor(i)+";' src='basket.png' alt='basket'>";
+                crateIndex += 1;
+            }
+        }
+        $('#extraCrates').html(extraCratesString);
+    }
+
     function showSecretsActions(){
         $('#secrets').html('<input style="margin: 5px;" id="peakbutton" type="button" value="Peak" onmousedown="refreshPeak()" onmouseup="unpeak()" onmouseout="unpeak()">');
+    }
+
+    function refreshFlipDeck(){
+        var flipDeckString = '';
+        for(var i = 0; i < informationFlipDeck.informationPieces.length; i++){
+            flipDeckString += '<div id="flipdeck_'+i+'" style="position: relative; overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
+        }
+        $('#extraInfo').html(flipDeckString);
     }
     
 </script>
@@ -708,15 +759,19 @@
         <input type="button" style="margin: 5px;" value="5 Players" onclick="choosePlayers(5);">
     </form>
 </div>
-<div id="mushroomBoards"></div>
-<div id="playerBoards"></div>
 <div id="current"></div>
 <div id="actions"><div>Game Phase: Pick number of players</div></div>
-<div id="gameHistory"></div>
 <div id="secrets"></div>
-<div id="peak" style="height: 100px;"></div>
+<div id="extraCrates" style="height: 30px; position: relative;"></div>
+<div id="extraInfo" style="position: relative;"></div>
 <div id="winners"></div>
-<div id="gamelog"><textarea id="gamelogtext" readonly style="width: 400px; height: 400px;"></textarea></div>
+<div>
+    <div style="display: inline-block;">
+        <div id="mushroomBoards"></div>
+        <div id="playerBoards"></div>
+    </div>
+    <div style="display: inline-block; position: relative; top: 0px;"><div>Game Log</div><textarea id="gamelogtext" readonly style="width: 400px; height: 400px;"></textarea></div>
+</div>
 <style id="customAnimation">
 </style>
 <div>Feedback: ccarrster@gmail.com <a href="http://chriscarr.name" target="_blank">About Developer</a> <a href="https://github.com/ccarrster/awethicket" target="_blank">Source Code</a> </div>
