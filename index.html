@@ -164,32 +164,46 @@
     function refreshMushroomBoards(){
         var mushroomBoardString = "";
         for(var i = 0; i < mushroomBoards.length; i++){
-            mushroomBoardString += "<div style='border: solid black 4px; margin: 5px;'>";
+            mushroomBoardString += "<div style='border: solid black 4px; margin: 5px; display: inline-block;'>";
             var mushroomBoard = mushroomBoards[i];
             mushroomBoardString += "<img src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
             var cratesString = "<div>";
             for(var j = 0; j < mushroomBoard.crates.length; j++){
                 var cratePlayer = mushroomBoard.crates[j];
                 var crateCount = getCrateCost(j);
-                cratesString += "<div>Crate Number: " + crateCount + " Crate Player: " + getPlayerColor(cratePlayer) + "</div>";
+                var crateImages = '';
+                for(var m = 0; m < crateCount; m++){
+                    crateImages += "<img style='max-width: 20px; background-color: "+getPlayerColor(cratePlayer)+";' src='basket.png' alt='basket'>";
+                }
+                cratesString += "<div>" + crateImages + " " + crateCount + " " + getPlayerColor(cratePlayer) + "</div>";
             }
             cratesString += "</div>";
-            var informationString = "<div>";
+            var informationString = "<div>Shared Value: ";
+            mushroomBoard.sharedInformation.sort(pointSort);
             for(var k = 0; k < mushroomBoard.sharedInformation.length; k++){
                 var sharedValue = mushroomBoard.sharedInformation[k].pointValue;
-                informationString += "<div>Shared Value: " + sharedValue + "</div>";
+                informationString += sharedValue;
+                if(k != mushroomBoard.sharedInformation.length - 1){
+                    informationString += ", ";
+                }
             }
             informationString += "</div>";
-            mushroomBoardString += "<div>Mushroom Type: "+getMushroomName(mushroomBoard.mushroomType)+" Quantity: "+mushroomBoard.mushroomQuantity+" " + cratesString + informationString +"</div>";
-            
-            
-            
+            var quantityImages = '';
+            for(var l = 0; l < mushroomBoard.mushroomQuantity; l++){
+                quantityImages += "<img style='max-width: 20px;' src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
+            }
+            mushroomBoardString += getMushroomName(mushroomBoard.mushroomType)+" "+mushroomBoard.mushroomQuantity+" " + quantityImages + " " + cratesString + informationString;
             if(isGameOver()){
                 mushroomBoardString += "<div>Value: " + mushroomBoard.information.pointValue + "</div>";
             }
+            mushroomBoardString += "</div>";
             mushroomBoardString += '</div>';
         }
         $("#mushroomBoards").html(mushroomBoardString);
+    }
+
+    function pointSort(a, b){
+        return a.pointValue - b.pointValue;
     }
 
     function getCrateCost(index){
@@ -211,15 +225,25 @@
     function refreshPlayerBoards(){
         var playerBoardString = '';
         for(var i = 0; i < players.length; i++){
-            var playerString = '<div style="margin: 5px; background-color: #eee; border: solid ' + getPlayerColor(i) + ' 4px;">' + getPlayerColor(i);
+            var playerString = '<div style="margin: 5px; background-color: #eee; border: solid ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
             var currentPlayerObject = players[i];
             for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
 
-                
-                playerString += '<div>' + currentPlayerObject.mushrooms[j] + ' X ' + getMushroomName(j) + "<img style='max-width: 20px;' src='" + getMushroomName(j) + ".png' alt='" + getMushroomName(j) + " mushroom'>" +'</div>';
+                var mushroomImages = '';
+                for(var m = 0; m < currentPlayerObject.mushrooms[j]; m++){
+                    mushroomImages += "<img style='max-width: 20px;' src='" + getMushroomName(j) + ".png' alt='" + getMushroomName(j) + " mushroom'>";
+                }
+                playerString += '<div>' + currentPlayerObject.mushrooms[j] + ' X ' + getMushroomName(j) + mushroomImages +'</div>';
             }
-            playerString += '<div>'+currentPlayerObject.availableCrates+' X Crates '+"<img style='max-width: 20px; background-color: "+getPlayerColor(i)+";' src='basket.png' alt='basket'>"+'</div>';
+            var crateImages = '';
+            for(var k = 0; k < currentPlayerObject.availableCrates; k++){
+                crateImages += "<img style='max-width: 20px; background-color: "+getPlayerColor(i)+";' src='basket.png' alt='basket'>";
+            }
+
+            playerString += '<div>'+currentPlayerObject.availableCrates+' X Crates '+ crateImages +'</div>';
             playerString += '<div>Turn skipped '+currentPlayerObject.skipped+'</div>';
+            playerString += '<div>First Player '+ (i == firstPlayer) +'</div>';
+            
             if(isGameOver()){
                 playerString += '<div>Points: ' + currentPlayerObject.points + '</div>';
             }
@@ -468,6 +492,7 @@
             if(firstPlayer >= players.length){
                 firstPlayer = 0;
             }
+            refreshPlayerBoards();
             appendLog('The first player will be ' + getPlayerColor(firstPlayer) + '.');
             currentPlayer = firstPlayer;
             showTurn();
@@ -564,6 +589,7 @@
     }
     
 </script>
+<div id="title">Awe Thicket - Mushroom Harvesting Board Game</div>
 <div id="setup">
     <form>
         <input type="button" style="margin: 5px;" value="2 Players" onclick="choosePlayers(2);">
@@ -580,7 +606,7 @@
 <div id="secrets"></div>
 <div id="peak"></div>
 <div id="winners"></div>
-<div id="gamelog"><textarea id="gamelogtext" readonly></textarea></div>
-<div>Feedback: ccarrster@gmail.com</div>
+<div id="gamelog"><textarea id="gamelogtext" readonly style="width: 400px; height: 400px;"></textarea></div>
+<div>Feedback: ccarrster@gmail.com <a href="http://chriscarr.name" target="_blank">About Developer</a> <a href="https://github.com/ccarrster/awethicket" target="_blank">Source Code</a> </div>
 </body>
 </html>
