@@ -236,7 +236,7 @@
             if(currentPlayerObject.skipped){
                 borderStyle = 'double';
             }
-            var playerString = '<div style="width: 250px; position: relative; margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
+            var playerString = '<div style="width: 250px; position: relative; margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: block;">' + getPlayerColor(i);
             for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
 
                 var mushroomImages = '';
@@ -255,7 +255,7 @@
             playerString += '<div>First Player '+ (i == firstPlayer) +'</div>';
             
             for(var n = 0; n < currentPlayerObject.informationPieces.length; n++){
-                playerString += '<div id="information_'+i+'_'+n+'" onclick="shareInfo('+i+', '+n+')" style="margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
+                playerString += '<div id="information_'+i+'_'+n+'" onclick="shareInfo('+i+', '+n+')" style="overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
             }
 
             if(isGameOver()){
