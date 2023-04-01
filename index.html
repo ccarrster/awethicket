@@ -165,7 +165,7 @@
     function refreshMushroomBoards(){
         var mushroomBoardString = "";
         for(var i = 0; i < mushroomBoards.length; i++){
-            mushroomBoardString += "<div style='border: solid black 4px; margin: 5px; display: inline-block;'>";
+            mushroomBoardString += "<div style='position:relative; border: solid black 4px; margin: 5px; background-color: #eee; display: inline-block;'>";
             var mushroomBoard = mushroomBoards[i];
             mushroomBoardString += "<img src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
             var cratesString = "<div>";
@@ -174,9 +174,9 @@
                 var crateCount = getCrateCost(j);
                 var crateImages = '';
                 for(var m = 0; m < crateCount; m++){
-                    crateImages += "<img style='max-width: 20px; background-color: "+getPlayerColor(cratePlayer)+";' src='basket.png' alt='basket'>";
+                    crateImages += "<img id='cratemushroomsmall_"+i+"_"+j+"_"+m+"' style='max-width: 20px; position: absolute; left: "+m*20+"px; background-color: "+getPlayerColor(cratePlayer)+";' src='basket.png' alt='basket'>";
                 }
-                cratesString += "<div>" + crateImages + " " + crateCount + " " + getPlayerColor(cratePlayer) + " <div style='display: inline' id='buymushroom_" + i + "_" + j + "'></div></div>";
+                cratesString += "<div style='position: relative;'>" + crateImages + " " + crateCount + " " + getPlayerColor(cratePlayer) + " <div style='display: inline' id='buymushroom_" + i + "_" + j + "'></div></div>";
             }
             cratesString += "</div>";
             var informationString = "<div>Shared Value: ";
@@ -191,7 +191,7 @@
             informationString += "</div>";
             var quantityImages = '';
             for(var l = 0; l < mushroomBoard.mushroomQuantity; l++){
-                quantityImages += "<img style='max-width: 20px;' src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
+                quantityImages += "<img id='mushroomsmall_"+i+"_"+l+"' style='position:absolute; left: "+20*l+"px; max-width: 20px;' src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
             }
             mushroomBoardString += getMushroomName(mushroomBoard.mushroomType)+" "+mushroomBoard.mushroomQuantity+" " + quantityImages + " " + cratesString + informationString;
             if(isGameOver()){
@@ -230,7 +230,7 @@
             if(i == currentPlayer){
                 borderStyle = 'dashed';
             }
-            var playerString = '<div style="margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
+            var playerString = '<div style="position: relative; margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
             var currentPlayerObject = players[i];
             for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
 
@@ -238,14 +238,14 @@
                 for(var m = 0; m < currentPlayerObject.mushrooms[j]; m++){
                     mushroomImages += "<img style='max-width: 20px;' src='" + getMushroomName(j) + ".png' alt='" + getMushroomName(j) + " mushroom'>";
                 }
-                playerString += '<div>' + currentPlayerObject.mushrooms[j] + ' X ' + getMushroomName(j) + mushroomImages +'</div>';
+                playerString += '<div>' + currentPlayerObject.mushrooms[j] + ' X ' + getMushroomName(j) + mushroomImages +'<div id="mushroomsmallplayer_'+i+'_'+j+'" style="display: inline-block; position: absolute; left: '+20*j+'px;"></div></div>';
             }
             var crateImages = '';
             for(var k = 0; k < currentPlayerObject.availableCrates; k++){
-                crateImages += "<img style='max-width: 20px; background-color: "+getPlayerColor(i)+";' src='basket.png' alt='basket'>";
+                crateImages += "<img id='crateplayersmall_"+i+"_"+k+"' style='position:absolute; left: "+20*k+"px; max-width: 20px; background-color: "+getPlayerColor(i)+";' src='basket.png' alt='basket'>";
             }
 
-            playerString += '<div>'+currentPlayerObject.availableCrates+' X Crates '+ crateImages +'</div>';
+            playerString += '<div style="position: relative;">'+currentPlayerObject.availableCrates+' X Crates '+ crateImages +'</div>';
             playerString += '<div>Turn skipped '+currentPlayerObject.skipped+'</div>';
             playerString += '<div>First Player '+ (i == firstPlayer) +'</div>';
             
@@ -302,7 +302,7 @@
                         for(var j = 0; j < cost; j++){
                             basketString += '<img style="max-width: 50px; background-color: '+getPlayerColor(currentPlayer)+';" src="basket.png" alt="basket">';
                         }
-                        actionString += '<div>'+"<img style='max-width: 50px;' src='" + getMushroomName(currentMushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(currentMushroomBoard.mushroomType) + " mushroom'>"+'<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">'+basketString+'</div>';
+                        //actionString += '<div>'+"<img style='max-width: 50px;' src='" + getMushroomName(currentMushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(currentMushroomBoard.mushroomType) + " mushroom'>"+'<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">'+basketString+'</div>';
                         $("#buymushroom_"+i+"_"+mushroomIndex).html('<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">');
                     }
                 }
@@ -314,6 +314,44 @@
                 pass();
             }
         }
+    }
+
+    function omnomEats(from, to){
+        var elementFrom = document.getElementById(from);
+        var rectFrom = elementFrom.getBoundingClientRect();
+        var elementTo = document.getElementById(to);
+        var rectTo = elementTo.getBoundingClientRect();
+        var styleElement = document.getElementById('customAnimation');
+        var yChange = rectFrom.top - rectTo.top;
+        //Not sure why minus 1
+        var yChange = yChange * -1;
+        var xChange = rectTo.left - rectFrom.left;
+        //Not sure why + 50
+        var xChange = xChange + 50;
+        console.log(rectTo.left);
+        console.log(rectFrom.left);
+        styleElement.innerHTML = '	.nomnomEat{\
+        animation:mysecond 1s;\
+        -webkit-animation:mysecond 1s; /* Safari and Chrome */\
+        }\
+    \
+        @keyframes mysecond\
+        {\
+        0%   {left:0px; top:0px;}\
+        50%   {left:'+xChange+'px; top:'+yChange+'px;}\
+        100% {left:0px; top:0px;}\
+        }\
+    \
+        @-webkit-keyframes mysecond /* Safari and Chrome */\
+        {\
+        0%   {left:0px; top:0px;}\
+        50% {left:'+xChange+'px; top:'+yChange+'px;}\
+        100% {left:0px; top:0px;}\
+        }';
+        document.getElementById(from).className = "nomnomEat";
+        eatFrom = from;
+        //foodToClear.push(eatFrom);
+        //setTimeout("clearFood()",1100);
     }
 
     function getMushroomCost(inMushroomBoard){
@@ -337,19 +375,40 @@
     }
 
     function buyMushroom(mushroomType, cost){
-        appendLog(getPlayerColor(currentPlayer) + ' picked a ' + getMushroomName(mushroomType) + ' with ' + cost + ' crates.');
-        var mushroomBoard = mushroomBoards[mushroomType];
-        var currentPlayerObject = players[currentPlayer];
-        currentPlayerObject.availableCrates -= cost;
-        putCratesOnMushroomBoard(mushroomBoard, currentPlayer);
-        mushroomBoard.mushroomQuantity -= 1;
-        currentPlayerObject.mushrooms[mushroomType] += 1;
-        getNextPlayer();
-        refreshMushroomBoards();
-        refreshPlayerBoards();
-        showTurn();
-        showActions();
+        //xxx
+        //May need crate index
+        //mushroom type, crate index, crate number
+        //cratemushroomsmall_"+i+"_"+j+"_"+m+
+
+
+        var playerIdString = "mushroomsmallplayer_"+currentPlayer+"_"+mushroomType;
+        var mushroomIdString = "mushroomsmall_"+mushroomType+"_0";
+        
+        var mushroomCrateIdString = "cratemushroomsmall_"+mushroomType+"_0_0";
+        var playerCrateIdString = "crateplayersmall_"+currentPlayer+"_"+mushroomType;
+        omnomEats(playerCrateIdString, mushroomCrateIdString);
+        setTimeout(() => {  
+           omnomEats(mushroomIdString, playerIdString);
+            setTimeout(() => {  
+                appendLog(getPlayerColor(currentPlayer) + ' picked a ' + getMushroomName(mushroomType) + ' with ' + cost + ' crates.');
+                var mushroomBoard = mushroomBoards[mushroomType];
+                var currentPlayerObject = players[currentPlayer];
+                currentPlayerObject.availableCrates -= cost;
+                putCratesOnMushroomBoard(mushroomBoard, currentPlayer);
+                mushroomBoard.mushroomQuantity -= 1;
+                currentPlayerObject.mushrooms[mushroomType] += 1;
+                setTimeout(() => {  
+                    getNextPlayer();
+                    refreshMushroomBoards();
+                    refreshPlayerBoards();
+                    showTurn();
+                    showActions();
+                }, 1400);
+            }, 1400);
+        }, 1400);
     }
+
+    
 
     function pass(){
         appendLog(getPlayerColor(currentPlayer) + ' passed picking mushrooms.');
@@ -626,6 +685,8 @@
 <div id="peak" style="height: 100px;"></div>
 <div id="winners"></div>
 <div id="gamelog"><textarea id="gamelogtext" readonly style="width: 400px; height: 400px;"></textarea></div>
+<style id="customAnimation">
+</style>
 <div>Feedback: ccarrster@gmail.com <a href="http://chriscarr.name" target="_blank">About Developer</a> <a href="https://github.com/ccarrster/awethicket" target="_blank">Source Code</a> </div>
 </body>
 </html>
