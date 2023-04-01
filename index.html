@@ -201,6 +201,8 @@
             mushroomBoardString += getMushroomName(mushroomBoard.mushroomType)+" "+mushroomBoard.mushroomQuantity+" " + quantityImages + " " + cratesString + informationString;
             if(gameOver == true){
                 mushroomBoardString += '<div style="position: relative; overflow: none; margin: 5px; margin-left: 170px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 80px; height: 120px;">'+"<img style='max-width: 35px; position: absolute; right: 5px; bottom: 5px;' src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'> "+mushroomBoard.information.pointValue+'</div>';
+            } else {
+                mushroomBoardString += '<div style="position: relative; overflow: none; margin: 5px; margin-left: 170px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 80px; height: 120px;">?</div>';
             }
             mushroomBoardString += "</div>";
             mushroomBoardString += '</div>';
