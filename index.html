@@ -500,7 +500,9 @@
             showRestartOptions();
         } else {
             appendLog('Knowledge Swap Phase.');
+            currentPlayer = firstPlayer;
             startSharePlayer = currentPlayer;
+            refreshPlayerBoards();
             showShareOptions();
         }
     }
