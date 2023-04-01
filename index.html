@@ -3,7 +3,9 @@
 <head>
 <title>Awe Thicket</title>
 <style>
-
+    .nomnomEat{
+        z-index: 1;
+    }
 </style>
 </head>
 <body>
@@ -165,7 +167,7 @@
     function refreshMushroomBoards(){
         var mushroomBoardString = "";
         for(var i = 0; i < mushroomBoards.length; i++){
-            mushroomBoardString += "<div style='position:relative; border: solid black 4px; margin: 5px; background-color: #eee; display: inline-block;'>";
+            mushroomBoardString += "<div style='position:relative; height: 300px; width: 300px; border: solid black 4px; margin: 5px; background-color: #eee; display: inline-block;'>";
             var mushroomBoard = mushroomBoards[i];
             mushroomBoardString += "<img src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
             var cratesString = "<div>";
@@ -174,12 +176,12 @@
                 var crateCount = getCrateCost(j);
                 var crateImages = '';
                 for(var m = 0; m < crateCount; m++){
-                    crateImages += "<img id='cratemushroomsmall_"+i+"_"+j+"_"+m+"' style='max-width: 20px; position: absolute; left: "+m*20+"px; background-color: "+getPlayerColor(cratePlayer)+";' src='basket.png' alt='basket'>";
+                    crateImages += "<img id='cratemushroomsmall_"+i+"_"+j+"_"+m+"' style='max-width: 20px; position: absolute; top: "+j*20+"px; left: "+m*20+"px; background-color: "+getPlayerColor(cratePlayer)+";' src='basket.png' alt='basket'>";
                 }
-                cratesString += "<div style='position: relative;'>" + crateImages + " " + crateCount + " " + getPlayerColor(cratePlayer) + " <div style='display: inline' id='buymushroom_" + i + "_" + j + "'></div></div>";
+                cratesString += "<div style='position: relative;'>" + crateImages +  "<div style='position: absolute; left: 100px; top: "+j*20+"px;' class='buybutton' id='buymushroom_" + i + "_" + j + "'></div></div>";
             }
             cratesString += "</div>";
-            var informationString = "<div>Shared Value: ";
+            var informationString = "<div style='position: absolute; bottom: 10px; left: 10px;'>Shared Value: ";
             mushroomBoard.sharedInformation.sort(pointSort);
             for(var k = 0; k < mushroomBoard.sharedInformation.length; k++){
                 var sharedValue = mushroomBoard.sharedInformation[k].pointValue;
@@ -191,7 +193,7 @@
             informationString += "</div>";
             var quantityImages = '';
             for(var l = 0; l < mushroomBoard.mushroomQuantity; l++){
-                quantityImages += "<img id='mushroomsmall_"+i+"_"+l+"' style='position:absolute; left: "+20*l+"px; max-width: 20px;' src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
+                quantityImages += "<img id='mushroomsmall_"+i+"_"+l+"' style='position: absolute; left: "+20*l+"px; max-width: 20px;' src='" + getMushroomName(mushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(mushroomBoard.mushroomType) + " mushroom'>";
             }
             mushroomBoardString += getMushroomName(mushroomBoard.mushroomType)+" "+mushroomBoard.mushroomQuantity+" " + quantityImages + " " + cratesString + informationString;
             if(isGameOver()){
@@ -230,8 +232,11 @@
             if(i == currentPlayer){
                 borderStyle = 'dashed';
             }
-            var playerString = '<div style="position: relative; margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
             var currentPlayerObject = players[i];
+            if(currentPlayerObject.skipped){
+                borderStyle = 'double';
+            }
+            var playerString = '<div style="width: 250px; position: relative; margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
             for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
 
                 var mushroomImages = '';
@@ -249,6 +254,10 @@
             playerString += '<div>Turn skipped '+currentPlayerObject.skipped+'</div>';
             playerString += '<div>First Player '+ (i == firstPlayer) +'</div>';
             
+            for(var n = 0; n < currentPlayerObject.informationPieces.length; n++){
+                playerString += '<div id="information_'+i+'_'+n+'" onclick="shareInfo('+i+', '+n+')" style="margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
+            }
+
             if(isGameOver()){
                 playerString += '<div>Points: ' + currentPlayerObject.points + '</div>';
             }
@@ -302,8 +311,7 @@
                         for(var j = 0; j < cost; j++){
                             basketString += '<img style="max-width: 50px; background-color: '+getPlayerColor(currentPlayer)+';" src="basket.png" alt="basket">';
                         }
-                        //actionString += '<div>'+"<img style='max-width: 50px;' src='" + getMushroomName(currentMushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(currentMushroomBoard.mushroomType) + " mushroom'>"+'<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">'+basketString+'</div>';
-                        $("#buymushroom_"+i+"_"+mushroomIndex).html('<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">');
+                        $("#buymushroom_"+i+"_"+mushroomIndex).html('<input style="margin: 5px;" type="button" value="Harvest" onclick="buyMushroom('+i+', '+cost+')">');
                     }
                 }
             }
@@ -317,6 +325,7 @@
     }
 
     function omnomEats(from, to){
+        //I have seen an error like the element does not exist
         var elementFrom = document.getElementById(from);
         var rectFrom = elementFrom.getBoundingClientRect();
         var elementTo = document.getElementById(to);
@@ -328,11 +337,9 @@
         var xChange = rectTo.left - rectFrom.left;
         //Not sure why + 50
         var xChange = xChange + 50;
-        console.log(rectTo.left);
-        console.log(rectFrom.left);
         styleElement.innerHTML = '	.nomnomEat{\
-        animation:mysecond 1s;\
-        -webkit-animation:mysecond 1s; /* Safari and Chrome */\
+        animation:mysecond 2s;\
+        -webkit-animation:mysecond 2s; /* Safari and Chrome */\
         }\
     \
         @keyframes mysecond\
@@ -375,21 +382,17 @@
     }
 
     function buyMushroom(mushroomType, cost){
-        //xxx
-        //May need crate index
-        //mushroom type, crate index, crate number
-        //cratemushroomsmall_"+i+"_"+j+"_"+m+
-
-
+        $('.buybutton').hide();
         var playerIdString = "mushroomsmallplayer_"+currentPlayer+"_"+mushroomType;
         var mushroomIdString = "mushroomsmall_"+mushroomType+"_0";
-        
         var mushroomCrateIdString = "cratemushroomsmall_"+mushroomType+"_0_0";
         var playerCrateIdString = "crateplayersmall_"+currentPlayer+"_"+mushroomType;
         omnomEats(playerCrateIdString, mushroomCrateIdString);
         setTimeout(() => {  
+           document.getElementById(playerCrateIdString).className = "";
            omnomEats(mushroomIdString, playerIdString);
             setTimeout(() => {  
+                document.getElementById(mushroomIdString).className = "";
                 appendLog(getPlayerColor(currentPlayer) + ' picked a ' + getMushroomName(mushroomType) + ' with ' + cost + ' crates.');
                 var mushroomBoard = mushroomBoards[mushroomType];
                 var currentPlayerObject = players[currentPlayer];
@@ -397,18 +400,14 @@
                 putCratesOnMushroomBoard(mushroomBoard, currentPlayer);
                 mushroomBoard.mushroomQuantity -= 1;
                 currentPlayerObject.mushrooms[mushroomType] += 1;
-                setTimeout(() => {  
-                    getNextPlayer();
-                    refreshMushroomBoards();
-                    refreshPlayerBoards();
-                    showTurn();
-                    showActions();
-                }, 1400);
-            }, 1400);
-        }, 1400);
+                getNextPlayer();
+                refreshMushroomBoards();
+                refreshPlayerBoards();
+                showTurn();
+                showActions();
+            }, 1000);
+        }, 1000);
     }
-
-    
 
     function pass(){
         appendLog(getPlayerColor(currentPlayer) + ' passed picking mushrooms.');
@@ -424,70 +423,74 @@
         refreshPlayerBoards();
         if(skippedPlayerCount == players.length){
             appendLog('Bonus mushrooms.');
+            mushroomBonusIndex = 0;
             getBonus();
-            clearCrates();
-            refreshMushroomBoards();
-            refreshPlayerBoards();
-            clearActions();
-            if(isGameOver()){
-                appendLog('The game is over.');
-                $('#secrets').html('');
-                //Points
-                for(var l = 0; l < mushroomBoards.length; l++){
-                    var mushroomValue = mushroomBoards[l].information.pointValue;
-                    appendLog(getMushroomName(l) + ' is worth ' + mushroomValue + ' points.');
-                }
-
-                for(var i = 0; i < players.length; i++){
-                    var player = players[i];
-                    player.points = 0;
-                    var playerTotalMushroomCount = 0;
-                    for(var j = 0; j < player.mushrooms.length; j++){
-                        var mushroomCount = player.mushrooms[j];
-                        playerTotalMushroomCount += mushroomCount;
-                        var mushroomType = j;
-                        var mushroomValue = mushroomBoards[j].information.pointValue;
-                        player.points += mushroomCount * mushroomValue;
-                    }
-                    appendLog(getPlayerColor(i) + ' has ' + player.points + ' points and ' + playerTotalMushroomCount + ' total mushrooms.');
-                }
-                //Winner and Ties
-                winners = [];
-                var maxScore = 0;
-                var maxCount = 0;
-                for(var k = 0; k < players.length; k++){
-                    var playerObject = players[k]
-                    var sumMushrooms = playerObject.mushrooms.reduce((partialSum, a) => partialSum + a, 0);
-                    //More Points
-                    if(playerObject.points > maxScore){
-                        winners = [k];
-                        maxScore = playerObject.points;
-                        maxCount = sumMushrooms;
-                    //Tie
-                    } else if(playerObject.points == maxScore){
-                        //More mushrooms
-                        if(sumMushrooms > maxCount){
-                            winners = [k];
-                            maxCount = sumMushrooms;
-                        } else if(sumMushrooms == maxCount) {
-                            //Same mushroom count
-                            winners.push(k);
-                        }
-                    }
-                }
-                //winners
-                showWinners(maxScore, maxCount);
-                refreshPlayerBoards();
-                refreshMushroomBoards();
-                showRestartOptions();
-            } else {
-                appendLog('Knowledge Swap Phase.');
-                startSharePlayer = currentPlayer;
-                showShareOptions();
-            }
         } else {
             showTurn();
             showActions();
+        }
+    }
+
+    function afterBonus(){
+        clearCrates();
+        refreshMushroomBoards();
+        refreshPlayerBoards();
+        clearActions();
+        if(isGameOver()){
+            appendLog('The game is over.');
+            $('#secrets').html('');
+            //Points
+            for(var l = 0; l < mushroomBoards.length; l++){
+                var mushroomValue = mushroomBoards[l].information.pointValue;
+                appendLog(getMushroomName(l) + ' is worth ' + mushroomValue + ' points.');
+            }
+
+            for(var i = 0; i < players.length; i++){
+                var player = players[i];
+                player.points = 0;
+                var playerTotalMushroomCount = 0;
+                for(var j = 0; j < player.mushrooms.length; j++){
+                    var mushroomCount = player.mushrooms[j];
+                    playerTotalMushroomCount += mushroomCount;
+                    var mushroomType = j;
+                    var mushroomValue = mushroomBoards[j].information.pointValue;
+                    player.points += mushroomCount * mushroomValue;
+                }
+                appendLog(getPlayerColor(i) + ' has ' + player.points + ' points and ' + playerTotalMushroomCount + ' total mushrooms.');
+            }
+            //Winner and Ties
+            winners = [];
+            var maxScore = 0;
+            var maxCount = 0;
+            for(var k = 0; k < players.length; k++){
+                var playerObject = players[k]
+                var sumMushrooms = playerObject.mushrooms.reduce((partialSum, a) => partialSum + a, 0);
+                //More Points
+                if(playerObject.points > maxScore){
+                    winners = [k];
+                    maxScore = playerObject.points;
+                    maxCount = sumMushrooms;
+                //Tie
+                } else if(playerObject.points == maxScore){
+                    //More mushrooms
+                    if(sumMushrooms > maxCount){
+                        winners = [k];
+                        maxCount = sumMushrooms;
+                    } else if(sumMushrooms == maxCount) {
+                        //Same mushroom count
+                        winners.push(k);
+                    }
+                }
+            }
+            //winners
+            showWinners(maxScore, maxCount);
+            refreshPlayerBoards();
+            refreshMushroomBoards();
+            showRestartOptions();
+        } else {
+            appendLog('Knowledge Swap Phase.');
+            startSharePlayer = currentPlayer;
+            showShareOptions();
         }
     }
 
@@ -518,16 +521,16 @@
         $('#actions').html('<div>Game Phase: Pick number of players</div>');
     }
 
-    function showShareOptions(){   
+    var inShareMode = false;
+
+    function showShareOptions(){  
+        inShareMode = true; 
         appendLog(getPlayerColor(currentPlayer) + ' turn to Knowledge Swap.');
         showTurn();
         var shareString = '<div>Game Phase: Knowledge Swap</div>';
         var currentPlayerObject = players[currentPlayer];
         if(currentPlayerObject.maxAvailableCrates < 7){
             var informationPieces = currentPlayerObject.informationPieces;
-            for(var i = 0; i < informationPieces.length; i++){
-                shareString += '<input type="button" style="margin: 5px;" value="Share Information card ' + (i + 1) + '" onclick="share('+i+')">';
-            }
             shareString += '<input type="button" style="margin: 5px;" value="Pass" onclick="passShare()">';
             $('#actions').html(shareString);
         } else {
@@ -558,6 +561,7 @@
         refreshMushroomBoards();
         refreshPlayerBoards();
         if(startSharePlayer == currentPlayer){
+            inShareMode = false;
             if(players.length == 2 && informationFlipDeck.informationPieces.length > 0){
                 var infoToFlip = informationFlipDeck.informationPieces.splice(0, 1)[0];
                 var currentMushroomBoard = mushroomBoards[infoToFlip.mushroomType];
@@ -595,12 +599,25 @@
     }
 
     function refreshPeak(){
-        var peakString = '';
         var playerInfo = players[currentPlayer].informationPieces;
         for(var i = 0; i < playerInfo.length; i++) {
-            peakString += '<div>Mushroom Type: '+getMushroomName(playerInfo[i].mushroomType)+' Point Value: '+playerInfo[i].pointValue+'<div>'
+            $('#information_'+currentPlayer+'_'+i).html("<img style='max-width: 25px;' src='" + getMushroomName(playerInfo[i].mushroomType) + ".png' alt='" + getMushroomName(playerInfo[i].mushroomType) + " mushroom'>"+playerInfo[i].pointValue);
         }
-        $("#peak").html(peakString);
+    }
+
+    function unpeak(){
+        var playerInfo = players[currentPlayer].informationPieces;
+        for(var i = 0; i < playerInfo.length; i++) {
+            $('#information_'+currentPlayer+'_'+i).html("?");
+        }
+    }
+
+    function shareInfo(playerId, infoId){
+        if(inShareMode == true){
+            if(playerId == currentPlayer){
+                share(infoId);
+            }
+        }
     }
 
     function clearCrates(){
@@ -615,13 +632,18 @@
         }
     }
 
+    var mushroomBonusIndex = 0;
+    
+
     function getBonus(){
-        for(var i = 0; i < mushroomBoards.length; i++){
+        if(mushroomBonusIndex == 4){
+            afterBonus();
+        } else {
             var totalCrates = [];
             for(var j = 0; j < players.length; j++){
                 totalCrates.push(0);
             }
-            var currentMushroomBoard = mushroomBoards[i];
+            var currentMushroomBoard = mushroomBoards[mushroomBonusIndex];
             if(currentMushroomBoard.mushroomQuantity > 0){
                 for(var k = 0; k < currentMushroomBoard.crates.length; k++){
                     var cratePlayer = currentMushroomBoard.crates[k];
@@ -641,9 +663,23 @@
                 }
                 if(mostPlayer != null){
                     currentMushroomBoard.mushroomQuantity -= 1;
-                    players[mostPlayer].mushrooms[i] += 1;
-                    appendLog(getPlayerColor(mostPlayer) + ' gets a bonus ' + getMushroomName(i) + '.');
+                    players[mostPlayer].mushrooms[mushroomBonusIndex] += 1;
+                    appendLog(getPlayerColor(mostPlayer) + ' gets a bonus ' + getMushroomName(mushroomBonusIndex) + '.');
+                    var playerIdString = "mushroomsmallplayer_"+mostPlayer+"_"+mushroomBonusIndex;
+                    var mushroomIdString = "mushroomsmall_"+mushroomBonusIndex+"_0";
+                    omnomEats(mushroomIdString, playerIdString);
+                    setTimeout(() => {  
+                        document.getElementById(mushroomIdString).className = "";
+                        mushroomBonusIndex += 1;
+                        getBonus();
+                    }, 1000);
+                } else {
+                    mushroomBonusIndex += 1;
+                    getBonus();
                 }
+            } else {
+                mushroomBonusIndex += 1;
+                getBonus();
             }
         }
     }
@@ -656,10 +692,6 @@
                 return;
             }
         }
-    }
-
-    function unpeak(){
-        $("#peak").html('');
     }
 
     function showSecretsActions(){
