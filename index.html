@@ -159,6 +159,7 @@
 
     function appendLog(text){
         $('#gamelogtext').val($('#gamelogtext').val() + text + "\n");
+        $('#gamelogtext').scrollTop($('#gamelogtext').prop("scrollHeight"));
     }
 
     function refreshMushroomBoards(){
@@ -175,7 +176,7 @@
                 for(var m = 0; m < crateCount; m++){
                     crateImages += "<img style='max-width: 20px; background-color: "+getPlayerColor(cratePlayer)+";' src='basket.png' alt='basket'>";
                 }
-                cratesString += "<div>" + crateImages + " " + crateCount + " " + getPlayerColor(cratePlayer) + "</div>";
+                cratesString += "<div>" + crateImages + " " + crateCount + " " + getPlayerColor(cratePlayer) + " <div style='display: inline' id='buymushroom_" + i + "_" + j + "'></div></div>";
             }
             cratesString += "</div>";
             var informationString = "<div>Shared Value: ";
@@ -225,7 +226,11 @@
     function refreshPlayerBoards(){
         var playerBoardString = '';
         for(var i = 0; i < players.length; i++){
-            var playerString = '<div style="margin: 5px; background-color: #eee; border: solid ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
+            var borderStyle = 'solid';
+            if(i == currentPlayer){
+                borderStyle = 'dashed';
+            }
+            var playerString = '<div style="margin: 5px; background-color: #eee; border: ' + borderStyle + ' ' + getPlayerColor(i) + ' 4px; display: inline-block;">' + getPlayerColor(i);
             var currentPlayerObject = players[i];
             for(var j = 0; j < currentPlayerObject.mushrooms.length; j++){
 
@@ -257,6 +262,7 @@
         appendLog('Picking Mushrooms Phase.');
         showTurn();
         showActions();
+        refreshPlayerBoards();
     }
 
     function showTurn(){
@@ -288,6 +294,8 @@
                 var currentMushroomBoard = mushroomBoards[i];
                 if(currentMushroomBoard.mushroomQuantity > 0){
                     var cost = getMushroomCost(currentMushroomBoard);
+                    var mushroomIndex = getMushroomIndex(currentMushroomBoard);
+                    //Not just cost but index now
                     if(cost != null && crates >= cost){
                         hasOptions = true;
                         var basketString = '';
@@ -295,6 +303,7 @@
                             basketString += '<img style="max-width: 50px; background-color: '+getPlayerColor(currentPlayer)+';" src="basket.png" alt="basket">';
                         }
                         actionString += '<div>'+"<img style='max-width: 50px;' src='" + getMushroomName(currentMushroomBoard.mushroomType) + ".png' alt='" + getMushroomName(currentMushroomBoard.mushroomType) + " mushroom'>"+'<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">'+basketString+'</div>';
+                        $("#buymushroom_"+i+"_"+mushroomIndex).html('<input style="margin: 5px;" type="button" value="Buy a ' + getMushroomName(currentMushroomBoard.mushroomType) + ' for ' + cost + ' crates" onclick="buyMushroom('+i+', '+cost+')">');
                     }
                 }
             }
@@ -312,6 +321,16 @@
             var cratePlayer = inMushroomBoard.crates[i];
             if(cratePlayer == null){
                 return getCrateCost(i);
+            }
+        }
+        return null;
+    }
+
+    function getMushroomIndex(inMushroomBoard){
+        for(var i = 0; i < inMushroomBoard.crates.length; i++){
+            var cratePlayer = inMushroomBoard.crates[i];
+            if(cratePlayer == null){
+                return i;
             }
         }
         return null;
@@ -337,13 +356,13 @@
         players[currentPlayer].skipped = true;
         getNextPlayer();
         refreshMushroomBoards();
-        refreshPlayerBoards();
         var skippedPlayerCount = 0;
         for(var i = 0; i < players.length; i++){
             if(players[i].skipped == true){
                 skippedPlayerCount += 1;
             }
         }
+        refreshPlayerBoards();
         if(skippedPlayerCount == players.length){
             appendLog('Bonus mushrooms.');
             getBonus();
@@ -492,9 +511,9 @@
             if(firstPlayer >= players.length){
                 firstPlayer = 0;
             }
-            refreshPlayerBoards();
             appendLog('The first player will be ' + getPlayerColor(firstPlayer) + '.');
             currentPlayer = firstPlayer;
+            refreshPlayerBoards();
             showTurn();
             appendLog('Picking Mushrooms Phase.');
             showActions();
@@ -604,7 +623,7 @@
 <div id="actions"><div>Game Phase: Pick number of players</div></div>
 <div id="gameHistory"></div>
 <div id="secrets"></div>
-<div id="peak"></div>
+<div id="peak" style="height: 100px;"></div>
 <div id="winners"></div>
 <div id="gamelog"><textarea id="gamelogtext" readonly style="width: 400px; height: 400px;"></textarea></div>
 <div>Feedback: ccarrster@gmail.com <a href="http://chriscarr.name" target="_blank">About Developer</a> <a href="https://github.com/ccarrster/awethicket" target="_blank">Source Code</a> </div>
