@@ -256,8 +256,13 @@
             }
 
             playerString += '<div style="position: relative;">'+currentPlayerObject.availableCrates+' X Crates '+ crateImages +'</div>';
-            playerString += '<div>Turn skipped '+currentPlayerObject.skipped+'</div>';
-            playerString += '<div>First Player '+ (i == firstPlayer) +'</div>';
+            var firstString = '';
+            if(i == firstPlayer){
+                firstString += '<div style="width: 20px; height: 20px; border-radius: 20px; border-style: solid; border-width: 10px; border-color: black;"></div>'
+            } else {
+                firstString += '<div style="width: 20px; height: 20px; border-radius: 20px; border-style: solid; border-width: 10px; border-color: #eee;"></div>'
+            }
+            playerString += '<div>'+ firstString +'</div>';
             
             for(var n = 0; n < currentPlayerObject.informationPieces.length; n++){
                 playerString += '<div id="information_'+i+'_'+n+'" onclick="shareInfo('+i+', '+n+')" style="position: relative; overflow: none; margin: 5px; background-color: #ccc; display: inline-block; border-radius: 5px; border-width: 3px; border-color: black; border-style: solid; width: 40px; height: 60px;">?</div>';
